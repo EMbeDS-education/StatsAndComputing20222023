@@ -10,3 +10,5 @@ PDAI/slides/01introduction.synctex.gz
 PDAI/slides/references.aux
 PDAI/jupyter/jupyterNotebooks/.ipynb_checkpoints/
 PDAI/jupyter/jupyterNotebooks/assignments/.ipynb_checkpoints/
+.DS_Store
+SLLD/.DS_Store

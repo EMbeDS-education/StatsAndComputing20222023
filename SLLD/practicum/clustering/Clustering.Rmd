@@ -1,7 +1,7 @@
 ---
 title: "*Clustering*"
-author: "L. Insolia, F. Chiaromonte (special thanks to J. Di Iorio)"
-date: "March 15th 2022"
+author: "S. Tonini, F. Chiaromonte (special thanks to J. Di Iorio and L. Insolia)"
+date: "February 14th 20223"
 output:
   pdf_document:
     toc: true
@@ -18,7 +18,9 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE) # just to clean the pdf 
 \section{Introduction}
 
 
-Clustering is the task of grouping a set of objects in such a way that objects in the same group (called a cluster) are more similar (according to a similarity or dissimilarity measure) to each other than to those in other groups (clusters).
+Clustering is the task of grouping a set of objects in such a way that objects in the same group (called a cluster) are more similar (according to a similarity or dissimilarity measure) to each other than to those in other groups (clusters). Thus, clustering looks to find homogeneous subgroups among the objects.
+
+Note that we can cluster observations on the basis of the features, or features on the basis of the observations. We will focus on clustering observations on the basis of the features.
 
 Cluster analysis itself is not one specific algorithm, but the general unsupervised classification ("no label") task to be solved. It can be achieved by various algorithms. We are going to focus on exhaustive algorithms which determine a hard partition: every point belongs to one group, and one group only.
 
@@ -99,6 +101,19 @@ legend("bottomright", fill = c("red","green3","blue"), legend = c( levels(iris$S
 These algorithms do not provide a unique data partition, but rather a nested hierarchical structure -- clusters are merged according to certain distances. 
 The hierarchy is usually represented by a dendrogram. 
 The $y$-axis marks the "similarity" across groups -- i.e., the distance at which clusters are merged -- and the $x$-axis contains a permutation of the grouped objects in such a way that clusters do not mix (i.e., vertical lines to not cross each other).
+
+Pros:
+\begin{itemize}
+  \item It does not require us to pre-specify the number of clusters $\boldsymbol{k}$
+  \item Dendrogram results in an attractive and simple tree-based representation of the observations
+\end{itemize}
+
+Cons: 
+\begin{itemize}
+  \item Often the choice of where to cut the dendrogram to select clusters is not so clear
+  \item The assumption of hierarchical structure might be unrealistic (i.e. clusters obtained by cutting the dendrogram at a given height are necessarily nested within the clusters obtained by cutting the dendrogram at any greater height)
+\end{itemize}
+
 
 Strategies for hierarchical clustering generally fall into two types:
 \begin{itemize}
@@ -248,7 +263,7 @@ pairs(iris4, col=cluster_diana)                           # pairwise scatterplot
 
 \section{$k$-means Clustering}
 
-$k$-means clustering is a partitioning algorithm that splits the data into $k$ clusters by iteratively computing centroids/moving data points until convergence.
+$k$-means clustering is a partitioning algorithm that splits the data into $k$ clusters by iteratively computing centroids/moving data points until convergence. Because the K-means algorithm finds a local optimum, the results obtained depend on the initial random cluster assignment.
 To perform the $k$-means clustering we can use the function \textbf{kmeans}.
 
 ```{r}

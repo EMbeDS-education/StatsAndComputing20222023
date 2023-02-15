@@ -16,3 +16,8 @@ SLLD/.DS_Store
 SLLD/.DS_Store
 SLLD/.DS_Store
 PDAI/jupyter/jupyterNotebooks/__pycache__/test_import_py.cpython-39.pyc
+.DS_Store
+PDAI/jupyter/jupyterNotebooks/__pycache__/pdai_utils.cpython-39.pyc
+PDAI/jupyter/jupyterNotebooks/covid_lastday.csv
+PDAI/jupyter/jupyterNotebooks/covid_lastday_b.csv
+PDAI/jupyter/jupyterNotebooks/covid_more_than_25k.csv

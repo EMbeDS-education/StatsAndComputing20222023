@@ -1,7 +1,7 @@
 ---
 title: "*Principal Component Analysis*"
-author: "L. Insolia, F. Chiaromonte (special thanks to J. Di Iorio)"
-date: "March 17th 2022"
+author: "S.Tonini, F. Chiaromonte (special thanks to J. Di Iorio and L. Insolia)"
+date: "February 16th 2023"
 output:
   pdf_document:
     toc: true

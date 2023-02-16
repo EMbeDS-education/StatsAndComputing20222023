@@ -21,3 +21,5 @@ PDAI/jupyter/jupyterNotebooks/__pycache__/pdai_utils.cpython-39.pyc
 PDAI/jupyter/jupyterNotebooks/covid_lastday.csv
 PDAI/jupyter/jupyterNotebooks/covid_lastday_b.csv
 PDAI/jupyter/jupyterNotebooks/covid_more_than_25k.csv
+PDAI/jupyter/jupyterNotebooks/images/.ipynb_checkpoints/box_plot_ref_needed-checkpoint.png
+.DS_Store

@@ -25,3 +25,5 @@ PDAI/jupyter/jupyterNotebooks/images/.ipynb_checkpoints/box_plot_ref_needed-chec
 .DS_Store
 PDAI/jupyter/jupyterNotebooks/interactive_chart.html
 PDAI/jupyter/jupyterNotebooks/data/.ipynb_checkpoints/WBCD_outliers_for_doctors-checkpoint.csv
+PDAI/jupyter/jupyterNotebooks/data/best_trained_model
+PDAI/jupyter/jupyterNotebooks/data/scaler

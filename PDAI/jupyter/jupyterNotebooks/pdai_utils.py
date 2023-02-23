@@ -91,13 +91,15 @@ def draw_boundary( algo, X_train,X_test, y_train, y_test, verbose=0):
     ylim = X2.min(), X2.max()
     
     # plot the dataset
-    if verbose>1:        
+    if verbose>1:     
+        print('Plotting the dataset...')
         plt.figure(figsize = (14,6))
         draw_pca_scatterplot(np.concatenate((X_train_reduced,X_test_reduced)), np.concatenate((y_train,y_test)),xlim,ylim,algo_name, 'Dataset')
         plt.show()
     
     # plot train and test set
     if verbose>0:
+        print('Plotting train and test set...')
         for setname, (X_set, y_set) in sets.items():
             plt.figure(figsize = (14,6))
             draw_pca_scatterplot(X_set, y_set,xlim,ylim,algo_name, setname)
@@ -105,6 +107,7 @@ def draw_boundary( algo, X_train,X_test, y_train, y_test, verbose=0):
     
     
     # plot decision boundary
+    print('Plotting decision boundary on train and test set...')
     for setname, (X_set, y_set) in sets.items():
         plt.figure(figsize = (14,6))
         plt.contourf(X1, X2, classifier.predict(np.array([X1.ravel(), X2.ravel()]).T).reshape(X1.shape),
@@ -418,22 +421,25 @@ def get_importance_features(model, X, y, columns):
     fig.tight_layout()
     plt.show() 
 
-def plot_decision_tree(model, X,y, column_names,class_names=['Benign','Malignant']):
+def plot_decision_tree(model, X,y, column_names,class_names=['Benign','Malignant'],file_name='plot_tree.pdf'):
     from sklearn import tree    
 
     #  Plot a decision tree nodes
-    fig = plt.figure(figsize=(25,20))
+    fig = plt.figure(figsize=(60,30))
     out = tree.plot_tree(model, 
                        feature_names=column_names,  
                        class_names=class_names,
-                       filled=True)
+                       filled=True, fontsize=25)
     #  Plot a decision tree edges
     for o in out: 
         arrow = o.arrow_patch
         if arrow is not None:
             arrow.set_edgecolor('red')
-            arrow.set_linewidth(3)
-        
+            arrow.set_linewidth(5)
+    #file_name='plot_tree.pdf'
+    print('Saving tree in file',file_name)
+    plt.savefig(file_name)
+    
 # utility function
 def draw_euclidean_distance(A,B,C,figsize=(15, 1), title='A,B,C weight and height (kg and cm)'):
     """ Computes the distance  between the (A,B) and (A,C) points and plot the result """

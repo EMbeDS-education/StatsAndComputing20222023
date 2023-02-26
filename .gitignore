@@ -29,3 +29,4 @@ PDAI/jupyter/jupyterNotebooks/data/best_trained_model
 PDAI/jupyter/jupyterNotebooks/data/scaler
 PDAI/jupyter/jupyterNotebooks/plot_tree.pdf
 PDAI/jupyter/jupyterNotebooks/plot_tree_validation.pdf
+.DS_Store

@@ -1,7 +1,7 @@
 ---
-title: "*Cross validation*"
-author: "L. Insolia, F. Chiaromonte (special thanks to J. Di Iorio)"
-date: "March 29th 2022"
+title: "*Cross Validation*"
+author: "S.Tonini, F. Chiaromonte (special thanks to J. Di Iorio and L. Insolia)"
+date: "February 28th 2023"
 output:
   pdf_document:
     toc: true
@@ -226,4 +226,66 @@ train_knn$finalModel
 The overall accuracy on the training set is:
 ```{r}
 confusionMatrix(predict(train_knn, mnist_27$test, type = "raw"),mnist_27$test$y)
+```
+
+
+
+\section{Temporal Block Cross Validation}
+
+
+Simple random sampling is probably not the best way to resample time series data. \textbf{caret} contains a function called \textbf{createTimeSlices} that can create the indices for this type of splitting.
+
+The function takes as input a vector and three parameters:
+\begin{itemize}
+    \item $y$: a vector of outcomes. These should be in chronological order
+    \item $initialWindow$: the initial number of consecutive values in each training set sample
+    \item $horizon$: The number of consecutive values in test set sample
+    \item $fixedWindow$: A logical: if FALSE, the training set always start at the first sample and the training set size will vary over data splits.
+\end{itemize}
+
+
+Example 1: one training set and one test set
+```{r}
+
+p <- 0.75
+
+createTimeSlices(y = 1:nrow(economics), 
+                 initialWindow = round(p*nrow(economics),0), 
+                 horizon = (nrow(economics)-round(p*nrow(economics),0)), 
+                 fixedWindow = TRUE)           # in this example fixedWindow doesn't matter!!
+
+```
+
+Example 2: rolling window
+```{r}
+
+createTimeSlices(y = 1:nrow(economics), 
+                 initialWindow = round(p*nrow(economics),0), 
+                 horizon = ((nrow(economics)-round(p*nrow(economics),0))-2), 
+                 fixedWindow = TRUE)
+
+```
+
+Example 3: recursive window
+```{r}
+
+createTimeSlices(y = 1:nrow(economics), 
+                 initialWindow = round(p*nrow(economics),0), 
+                 horizon = ((nrow(economics)-round(p*nrow(economics),0))-2), 
+                 fixedWindow = FALSE)
+
+```
+
+
+Tip for Mod 2!!!
+
+The function \textbf{trainControl} (in \textbf{caret}) controls the computational setup of the \textbf{train} function.
+
+The created object can be placed in the \textbf{trControl} argument.
+
+```{r}
+#trainControl(method = "timeslice",
+#             initialWindow = 90,
+#             horizon = 25,
+#             fixedWindow = FALSE)
 ```

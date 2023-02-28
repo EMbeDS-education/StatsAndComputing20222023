@@ -1,13 +1,14 @@
 ---
 title: "*Classification*"
-author: "L. Insolia, F. Chiaromonte (special thanks to J. Di Iorio)"
-date: "March 22nd 2022"
+author: "S.Tonini, F. Chiaromonte (special thanks to J. Di Iorio and L. Insolia)"
+date: "February 21th 2023"
 output:
   pdf_document:
     toc: true
   html_document: default
 urlcolor: blue
 ---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

@@ -186,11 +186,16 @@ It is also easy to get a confidence interval (but be careful) using the function
 This function generates (by default) 5 different types of equi-tailed two-sided nonparametric confidence intervals. 
 These are:
 \begin{itemize}
-  \item first order normal approximation;
-  \item basic bootstrap interval
-  \item studentized bootstrap interval (bootstrap variance needed)
-  \item bootstrap percentile interval
-  \item adjusted bootstrap percentile (BCa) interval. 
+  \item  first order normal approximation: uses the standard deviation for calculation of CI. Use when statistic is unbiased. Is normally distributed.
+  
+  \item basic bootstrap interval: uses percentile to calculate upper and lower limit of test statistic. Use when statistic is unbiased and homoscedastic. The bootstrap statistic can be transformed to a standard normal distribution
+  
+  \item studentized bootstrap interval (bootstrap variance needed): resamples the bootstrap sample to find a second-stage bootstrap statistic and use it to calculate the CI. Use when statistic is homoscedastic. The standard error of bootstrap statistic can be estimated by second-stage resampling.
+ 
+  \item  bootstrap percentile interval: uses quantiles eg 2.5\%, 5\% etc. to calculate the CI. Use when statistic is unbiased and homoscedastic. The standard error of your bootstrap statistic and sample statistics are the same.
+  
+  \item adjusted bootstrap percentile (BCa) interval: uses percentile limits with bias correction and estimate acceleration coefficient corrects the limit and find the CI. The bootstrap statistic can be transformed to a normal distribution. The normal-transformed statistic has a constant bias. 
+
 \end{itemize}
 
 ```{r}

@@ -205,7 +205,19 @@ In the presence of a a tuning parameter, it automatically uses cross validation 
 ggplot(train_knn, highlight = TRUE)
 ```
 
-By default, cross validation is performed by taking 25 bootstrap samples comprising 25\% of the observations. 
+By default, caret used bootstrap resampling with 25 repetitions – this is the default resampling approach in caret. The process caret used was:
+
+\begin{itemize}
+\item Randomly sample the data with replacement. This means that a single observation could be chosen more than once. The total size of the modeling dataset will be the same as the original dataset but some observations will not be included and some will be included more than once.
+\item Develop a model based on the randomly sampled observations only.
+\item Use the withheld observations (also known as “out-of-bag” (OOB) observations) to compute the Accuracy based on the predictions.
+\item Repeat the process (25 models are run) and average the Accuracy values.
+\item When the resampling is done, caret then runs a final model on the full dataset and stores this in finalModel. So, in this example, 25 + 1 models are run, 25 bootstraps and one model run using full dataset.
+\end{itemize}
+
+
+Note: the Accuracy is the percentage of correctly classified OOB observations.
+
 For the kNN method, the default is to try $k= (5,7,9)$. 
 
 We can change this using the \textbf{tuneGrid} parameter.
@@ -228,7 +240,18 @@ The overall accuracy on the training set is:
 confusionMatrix(predict(train_knn, mnist_27$test, type = "raw"),mnist_27$test$y)
 ```
 
+we can use k-folds cross-validation instead of bagging by setting
 
+```{r}
+set.seed(2023)
+tc <- trainControl(method = "cv", number = 10)
+
+train_kCV <- train(y ~ ., method = "knn", 
+                   data = mnist_27$train,
+                   trControl = tc)
+ggplot(train_kCV, highlight = TRUE)
+
+```
 
 \section{Temporal Block Cross Validation}
 

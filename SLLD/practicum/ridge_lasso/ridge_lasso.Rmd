@@ -33,6 +33,7 @@ library(glmnet)     # ridge and lasso for GLMs
 library(tidyverse)  # data manipulation and visualization
 library(caret)      # statistical learning techniques
 library(ggplot2)    # plots
+library(corrplot)   # correlation matrix plotting
 ```
 
 \subsection{Data}
@@ -159,6 +160,12 @@ legend(x = "bottomright",
        col = c("red", "blue"))
 ```
 
+WristC has a very strong negative effect on the response. Why is that? We can find a partial answer by looking at the correlation matrix!
+
+```{r}
+corrplot(cor(df))
+```
+
 Let's re-fit the model and see the estimates associated to the minimum $\lambda$.
 
 ```{r}
@@ -273,8 +280,6 @@ coef(cv_lasso)
 However, lasso assumptions are unlikely to hold due to strong correlations between predictors.
 
 ```{r}
-library(corrplot)
-
 # original data
 corrplot(cor(x_var))
 
@@ -316,7 +321,7 @@ corrplot(cov2cor(sigma1))
 corrplot(cov2cor(sigma2))
 ```
 
-The first design matrix does not satisfy IRC, while the second does. Let's check it "visually", by exploring the regularization paths!
+The first variance-covariance matrix does not satisfy IRC, while the second does. Let's check it "visually", by exploring the regularization paths!
 
 ```{r}
 X1 = rmvnorm(N,sigma = sigma1) # Variables violating IRC
@@ -337,7 +342,7 @@ matplot(as.matrix(l2),t(coef(lasso2)[-1,]),type="l",lty=1,col=c(rep(1,9),2),ylab
 
 \section{Nonconvex penalization methods}
 
-If you want to try nonconvex penalization methods, have a look at the \textbf{ncvreg} package! It has a very similar syntax than glmnet.
+If you want to try nonconvex penalization methods, have a look at the \textbf{ncvreg} package! It has a very similar syntax than glmnet (check the paper [here](https://projecteuclid.org/journals/annals-of-applied-statistics/volume-5/issue-1/Coordinate-descent-algorithms-for-nonconvex-penalized-regression-with-applications-to/10.1214/10-AOAS388.full)).
 
 ```{r}
 library(ncvreg)

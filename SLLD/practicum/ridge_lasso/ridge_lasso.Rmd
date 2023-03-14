@@ -112,7 +112,7 @@ summary(ridge)
 
 The summary is quite different than the one for linear regression, since ridge regression requires the tuning of $\lambda$. The code above fits a ridge regression for each $\lambda$ value, and we have access to each of these model estimates.
 
-We can plot the panalization path as follows:
+We can plot the regularization path as follows:
 
 ```{r}
 dim(ridge$beta)
@@ -285,27 +285,29 @@ corrplot(cor(newx), tl.pos='n')
 
 \section{Digging in the irrepresentability condition}
 
-As you have seen before, the variance-covariance matrix can tell us whether LASSO will work (at least asymptotically) on the data at our disposal. Let's have a look at an example (available [here](https://www.r-bloggers.com/2017/06/when-the-lasso-fails/)). 
+As you have seen before, the variance-covariance matrix can tell us whether LASSO will work (at least asymptotically) on the data at our disposal. Let's have a look at an example (available [here](https://www.r-bloggers.com/2017/06/when-the-lasso-fails/)).
 
 ```{r}
-library(mvtnorm) # Sampling from a multivariate Normal
-library(clusterGeneration)
-
-k=10 # = Number of Candidate Variables
-p=5 # = Number of Relevant Variables
-N=500 # = Number of observations
-
-betas=(-1)^(1:p) # = Values for beta
 set.seed(12345) # = Seed for replication
 
-sigma1=genPositiveDefMat(k,"unifcorrmat")$Sigma # = Sigma1 violates the irc
-sigma2=sigma1 # = Sigma2 satisfies the irc
-sigma2[(p+1):k,1:p]=0
+library(mvtnorm) # Sampling from a multivariate Normal
+library(clusterGeneration) # Random matrix generation
+
+k = 10 # = Number of Candidate Variables
+p = 5 # = Number of Relevant Variables
+N = 500 # = Number of observations
+
+betas = (-1)^(1:p) # = Values for beta
+
+sigma1 = genPositiveDefMat(k,"unifcorrmat")$Sigma # sigma1 violates irc
+
+sigma2 = sigma1 # sigma2 satisfies irc
+sigma2[(p+1):k,1:p]=0 # removing correlation among active and nonactive variables
 sigma2[1:p,(p+1):k]=0
 
-# = Verify the irrepresentable condition
-irc1=sort(abs(sigma1[(p+1):k,1:p]%*%solve(sigma1[1:p,1:p])%*%sign(betas)))
-irc2=sort(abs(sigma2[(p+1):k,1:p]%*%solve(sigma2[1:p,1:p])%*%sign(betas)))
+# Verify irrepresentable condition
+irc1 = sort(abs(sigma1[(p+1):k,1:p] %*% solve(sigma1[1:p,1:p]) %*% sign(betas)))
+irc2 = sort(abs(sigma2[(p+1):k,1:p] %*% solve(sigma2[1:p,1:p]) %*% sign(betas)))
 c(max(irc1),max(irc2))
 
 # = Have a look at the correlation matrices
@@ -317,23 +319,21 @@ corrplot(cov2cor(sigma2))
 The first design matrix does not satisfy IRC, while the second does. Let's check it "visually", by exploring the regularization paths!
 
 ```{r}
-X1=rmvnorm(N,sigma = sigma1) # Variables violating IRC
-X2=rmvnorm(N,sigma = sigma2) # Variables satisfying IRC
-e=rnorm(N) # = Error = #
-y1=X1[,1:p]%*%betas+e # = Generate y for design 1 = #
-y2=X2[,1:p]%*%betas+e # = Generate y for design 2 = #
-lasso1=glmnet(X1,y1,nlambda = 100) # = Estimation for design 1 = #
-lasso2=glmnet(X2,y2,nlambda = 100) # = Estimation for design 2 = #
+X1 = rmvnorm(N,sigma = sigma1) # Variables violating IRC
+X2 = rmvnorm(N,sigma = sigma2) # Variables satisfying IRC
+e = rnorm(N) # Error from Standard Normal
+y1 = X1[,1:p]%*%betas+e # Generate y for design 1
+y2 = X2[,1:p]%*%betas+e # Generate y for design 2
+lasso1 = glmnet(X1,y1,nlambda = 100) # Estimation for design 1
+lasso2 = glmnet(X2,y2,nlambda = 100) # Estimation for design 2
 
-## == Regularization path == ##
+# Regularization paths
 par(mfrow=c(1,2))
 l1=log(lasso1$lambda)
 matplot(as.matrix(l1),t(coef(lasso1)[-1,]),type="l",lty=1,col=c(rep(1,9),2),ylab="coef",xlab="log(lambda)",main="Violates IRC")
 l2=log(lasso2$lambda)
 matplot(as.matrix(l2),t(coef(lasso2)[-1,]),type="l",lty=1,col=c(rep(1,9),2),ylab="coef",xlab="log(lambda)",main="Satisfies IRC")
-
 ```
-
 
 \section{Nonconvex penalization methods}
 

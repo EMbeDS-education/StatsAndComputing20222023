@@ -1,14 +1,13 @@
 ---
 title: "*Feature Screening*"
-author: "L. Insolia, F. Chiaromonte"
-date: "May 17th 2022"
+author: "F. Chiaromonte (48.5%), L. Insolia (48.5%), L. Testa (1%)"
+date: "March 16th 2023"
 output:
   pdf_document:
     toc: true
   html_document: default
 urlcolor: blue
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -38,12 +37,8 @@ library(caret)      # classification learning (confusion matrix)
 We will simulate some Gaussian data for an example with continuous response.
 
 We will also analyze Leukemia data (with a binary response) that are provided in the SIS package:
-\begin{itemize}
-  \item leukemia.test: Gene expression 7129 genes from 34 patients with acute leukemias (20 in class Acute Lymphoblastic Leukemia and 14 in class Acute Myeloid Leukemia).
-  \item leukemia.train: Gene expression of 7129 genes from 38 patients with acute leukemias (27 in class Acute Lymphoblastic Leukemia and 11 in class Acute Myeloid Leukemia).
-study
-\end{itemize}
-
+- leukemia.test: Gene expression 7129 genes from 34 patients with acute leukemias (20 in class Acute Lymphoblastic Leukemia and 14 in class Acute Myeloid Leukemia).
+- leukemia.train: Gene expression of 7129 genes from 38 patients with acute leukemias (27 in class Acute Lymphoblastic Leukemia and 11 in class Acute Myeloid Leukemia).
 
 \section{Linear regression}
 
@@ -104,19 +99,18 @@ x.train <- X
 
 ```
 
-
 Let's check the SIS function.
 It first implements the Iterative Sure Independence Screening for different variants of
 (I)SIS, and then fits the final regression model using the R packages ncvreg and glmnet for the SCAD/MCP/LASSO regularized loglikelihood for the variables picked by (I)SIS.
+
 ```{r}
 help(SIS)
 ```
 
 We now perform variable selection using:
-\begin{itemize}
-  \item SIS: in its vanilla version
-  \item ISIS: the iterated version of SIS
-\end{itemize}
+- SIS: in its vanilla version
+- ISIS: the iterated version of SIS
+
 These are paired with the LASSO penalty and the ten-fold cross-validation method for choosing the regularization parameter.
 
 ```{r}

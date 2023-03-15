@@ -1,30 +1,30 @@
 ---
-title: "*Best Subset Selection*"
-author: "L. Insolia, F. Chiaromonte (special thanks to J. Di Iorio)"
-date: "May 11th 2022"
+title: "*Feature Selection*"
+author: "F. Chiaromonte (33%), J. Di Iorio (33%), L. Insolia (33%), L. Testa (1%)"
+date: "March 16th 2023"
 output:
   pdf_document:
     toc: true
   html_document: default
 urlcolor: blue
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
-
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) # just to clean the pdf files, not recommended in practice!
 ```
 
-
 \section{Introduction}
 
 \subsection{Libraries}
 
 We are going to use:
-\begin{itemize}
-  \item \textbf{caret}: \textit{Classification and Regression Training}
-  \item \textbf{leaps}: \textit{Regression Subset Selection}
-\end{itemize}
+
+-   caret: Classification and Regression Training
+-   leaps: Regression Subset Selection
 
 ```{r}
 library(caret)  # statistical learning techniques
@@ -33,11 +33,14 @@ library(leaps)  # BSS
 
 \subsection{Data}
 
+We will use the \textbf{Body Fat dataset} (which is available in the [Datasets folder](https://github.com/EMbeDS-education/StatsAndComputing20212022/wiki/Datasets) of our course).
+See also the practicum material from last lecture.
 
-We will use the \textbf{Body Fat dataset} (which is available in the [Datasets folder](https://github.com/EMbeDS-education/StatsAndComputing20212022/wiki/Datasets) of our course). 
-See also the practicum material from yesterday.
+The data concerns a sample of 252 men, and contains 15 different variables.
+We want to understand if we can reliably describe and predict body fat percentage on the basis of these variables, using regression.
+For age, we only have a binary indicator separating men below and above 45 years.
+The body measurements, on the other hand, are all continuous variables.
 
-The data concerns a sample of 252 men, and contains 15 different variables. We want to understand if we can reliably describe and predict body fat percentage on the basis of these variables, using regression. For age, we only have a binary indicator separating men below and above 45 years. The body measurements, on the other hand, are all continuous variables. 
 ```{r}
 df <- read.table('BODY_FAT.TXT', header=TRUE)
 names(df)
@@ -45,30 +48,32 @@ names(df)
 
 We want to predict "SiriBF." using all other features aside from "Density".
 So we drop the "Density" column.
+
 ```{r}
 df <- df[,-1]
 ```
 
-
 \section{Best Subset Selection (Linear Regression)}
 
-
-We will use the \textbf{regsubsets()} function (part of the \textbf{leaps} library). 
-It performs best subset selection by identifying the best model that contains a given number of predictors, where the notion of "best" is based on the in-sample RSS. 
-No cross-validation is performed. 
+We will use the \textbf{regsubsets()} function (part of the \textbf{leaps} library).
+It performs best subset selection by identifying the best model that contains a given number of predictors, where the notion of "best" is based on the in-sample RSS.
+No cross-validation is performed.
 The summary() command outputs the best set of variables for each model size.
+
 ```{r}
 regfit.full = regsubsets(SiriBF. ~ ., data = df,  nvmax = 13, method="exhaustive")
 summary(regfit.full)
 ```
 
-The summary() function also returns $R^2$, $RSS$ $R^{2}_{adj}$, $C_{p}$, and $BIC$. 
+The summary() function also returns $R^2$, $RSS$ $R^{2}_{adj}$, $C_{p}$, and $BIC$.
 We can examine these to try to select the best overall model.
+
 ```{r}
 names(summary(regfit.full))
 ```
 
 As expected, the $R^2$ statistic increases monotonically as more variables are included into the model.
+
 ```{r}
 summary(regfit.full)$rsq
 #plot rss
@@ -76,6 +81,7 @@ plot(summary(regfit.full)$rsq, type="b")
 ```
 
 Let us plot also the other indexes.
+
 ```{r}
 reg.summary <- summary(regfit.full)
 par(mfrow=c(2,2))
@@ -101,17 +107,18 @@ abline(v=min_bic, col="red", lty=2)
 Note that the use of different criteria leads to different decisions.
 
 Here is another useful visualization tool which is available in leaps:
+
 ```{r}
 plot(regfit.full,scale="bic") #for "bic"
 plot(regfit.full,scale="adjr2") #for "adjr2"
 ```
-
 
 \subsection{Tuning strategies}
 
 To select the best model we are going to use cross-validation.
 
 For instance, we can start by splitting the observations into a training set and a test set (of size 80 vs 20%).
+
 ```{r}
 
 dim(df)
@@ -125,20 +132,24 @@ length(train)
 ```
 
 Now, we apply regsubsets() on the training set:
+
 ```{r}
-regfit.best <- regsubsets(SiriBF. ~ ., data = df[train,],  nvmax = 13,
-                          method="exhaustive")
+regfit.best <- regsubsets(SiriBF. ~ ., data = df[train,],  nvmax = 13, method="exhaustive")
 ```
 
 We then compute the test set error for the best model of each size.
 We need to compute all of this by hand, since the leaps library does not provide a predict function (as it is customary for R packages).
 Thus, we first make a model matrix containing test data:
+
 ```{r}
 test.mat = model.matrix(SiriBF. ~ ., data = df[test,])
 dim(test.mat)
 ```
 
-Within a for loop, for each size $i$, we extract the coefficients for the best model of that size. We generate the predictions by multiplying them into the appropriate columns of the test model matrix. Then, we compute the MSPE on test data.
+Within a for loop, for each size $i$, we extract the coefficients for the best model of that size.
+We generate the predictions by multiplying them into the appropriate columns of the test model matrix.
+Then, we compute the MSPE on test data.
+
 ```{r}
 p = (ncol(df)-1) # number of predictors
 mse <- rep(NA, p)
@@ -156,13 +167,15 @@ legend(x = "bottomright",
        col = "red")
 ```
 
-The best model is the one with 5 parameters (plus the intercept term). 
+The best model is the one with 5 parameters (plus the intercept term).
 Let us see the coefficients:
+
 ```{r}
 coef(regfit.best, which.min(mse))
 ```
 
-We now perform best subset selection on the full data set and select the best 5 variables. 
+We now perform best subset selection on the full data set and select the best 5 variables.
+
 ```{r}
 regfit.best.full <- regsubsets(SiriBF. ~ ., data=df ,nvmax=13)
 coef(regfit.best.full, which.min(mse))
@@ -170,6 +183,7 @@ coef(regfit.best.full, which.min(mse))
 
 Focusing on the full dataset, we do not necessarily retrieve the same 5 variables that were obtained from the training set alone.
 However, in this example we retrieve the same set of selected features.
+
 ```{r}
 rescompare <- rbind(coef(regfit.best, which.min(mse)), 
                     coef(regfit.best.full, which.min(mse)))
@@ -179,6 +193,7 @@ rescompare
 
 We now consider a k-fold CV (with 10-folds).
 Let's create 10 folds through the caret package:
+
 ```{r}
 k = 10
 set.seed(123)
@@ -198,8 +213,10 @@ cv.errors=matrix(NA, k, # num of folds
                  dimnames=list(NULL, paste(1:p)))
 ```
 
-Now we write a for loop that performs cross-validation.  We make our predictions for each model size, compute the test errors on the appropriate subset, and store them in the appropriate slot in the matrix cv.errors.
+Now we write a for loop that performs cross-validation.
+We make our predictions for each model size, compute the test errors on the appropriate subset, and store them in the appropriate slot in the matrix cv.errors.
 Considering the absence of a predict() function we create our own function where objects would be the result of regsubset(), newdata comprising the test set, and id as the number of parameters in the models obtained by regsubset().
+
 ```{r}
 predict.regsubsets =function (object, newdata, id, ...){
   form=as.formula(object$call[[2]])
@@ -211,6 +228,7 @@ predict.regsubsets =function (object, newdata, id, ...){
 ```
 
 We are ready!
+
 ```{r}
 # loop for each fold
 for(j in 1:k){
@@ -224,8 +242,10 @@ for(j in 1:k){
 }
 ```
 
-The result is stored in the cv.errors matrix having on the rows the folds and on the columns the number of variables of the model. Each cell contains the MSPE.
+The result is stored in the cv.errors matrix having on the rows the folds and on the columns the number of variables of the model.
+Each cell contains the MSPE.
 Now we compute column-wise averages.
+
 ```{r}
 mean_mse <- colMeans(cv.errors)
 plot(mean_mse, type='b')
@@ -237,6 +257,7 @@ legend(x = "bottomright",
 ```
 
 Using this approach we should retain 4 variables (plus the intercept):
+
 ```{r}
 reg.best  <- regsubsets (SiriBF. ~ ., data=df, nvmax=p)
 coef(reg.best, which.min(mean_mse))
@@ -251,10 +272,11 @@ Have a look at the \textbf{best-subset} package if you need to perform best subs
 # install_github(repo="ryantibs/best-subset", subdir="bestsubset")
 ```
 
-
 \subsection{Forward and Backward Stepwise Selection}
 
-The regsubsets() function can be used to perform forward stepwise or backward stepwise selection. In order to do so, we need  to set the argument method=“forward” or method=“backward” (as opposed to "exhaustive").
+The regsubsets() function can be used to perform forward stepwise or backward stepwise selection.
+In order to do so, we need to set the argument method="forward" or method="backward" (as opposed to "exhaustive").
+
 ```{r}
 regfit.fwd = regsubsets(SiriBF. ~. , data=df,nvmax=13, method ="forward")
 regfit.bwd = regsubsets(SiriBF. ~. , data=df,nvmax=13, method ="backward")
@@ -264,12 +286,10 @@ summary(regfit.bwd)
 
 We can notice that the best k-variables models can be different according to the stepwise procedure.
 
-
 \section{GLMs}
 
-In the case of GLM (see, for instance, logistic regression), we can use the \textbf{bestglm} library. 
-It performs best subset selection for GLMs and computes AIC, BIC, EBIC, BICq or Cross-Validation. 
+In the case of GLM (see, for instance, logistic regression), we can use the \textbf{bestglm} library.
+It performs best subset selection for GLMs and computes AIC, BIC, EBIC, BICq or Cross-Validation.
 It also calls the leaps library when performing linear regression.
 
 See also the \textbf{glmulti} library.
-

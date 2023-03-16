@@ -29,6 +29,7 @@ We are going to use:
 ```{r}
 library(caret)  # statistical learning techniques
 library(leaps)  # BSS
+library(glmnet)
 ```
 
 \subsection{Data}
@@ -51,6 +52,23 @@ So we drop the "Density" column.
 
 ```{r}
 df <- df[,-1]
+```
+
+\section{LASSO}
+We can start this practicum with one of the methods we discovered during the last lecture: the LASSO. As you have learnt, the LASSO implicitly performs feature selection.
+
+```{r}
+x_var <- data.matrix(df[,-1])     # NOTE: glmnet requires a matrix structure
+# getting the response variable
+y_var <- df[,"SiriBF."]
+
+cv_lasso <- cv.glmnet(x_var, y_var, alpha = 1)
+cv_lasso
+plot(cv_lasso)
+
+min_lasso <- glmnet(x_var, y_var, alpha=1, lambda= cv_lasso$lambda.min)
+lasso_coefs <- coef(min_lasso)
+lasso_coefs
 ```
 
 \section{Best Subset Selection (Linear Regression)}
@@ -106,7 +124,7 @@ abline(v=min_bic, col="red", lty=2)
 
 Note that the use of different criteria leads to different decisions.
 
-Here is another useful visualization tool which is available in leaps:
+Here is another visualization tool which is available in leaps and that you may find useful:
 
 ```{r}
 plot(regfit.full,scale="bic") #for "bic"
@@ -152,7 +170,7 @@ Then, we compute the MSPE on test data.
 
 ```{r}
 p = (ncol(df)-1) # number of predictors
-mse <- rep(NA, p)
+mse <- rep(NA, p) # out-of-sample MSE
 for(i in 1:p){
   coefi=coef(regfit.best,id=i)
   pred=test.mat[,names(coefi)]%*%coefi
@@ -218,12 +236,12 @@ We make our predictions for each model size, compute the test errors on the appr
 Considering the absence of a predict() function we create our own function where objects would be the result of regsubset(), newdata comprising the test set, and id as the number of parameters in the models obtained by regsubset().
 
 ```{r}
-predict.regsubsets =function (object, newdata, id, ...){
-  form=as.formula(object$call[[2]])
-  mat=model.matrix(form,newdata)
-  coefi=coef(object ,id=id)
-  xvars=names(coefi)
-  mat[,xvars]%*%coefi
+predict.regsubsets = function (object, newdata, id, ...){
+  form = as.formula(object$call[[2]])
+  mat = model.matrix(form,newdata)
+  coefi = coef(object ,id=id)
+  xvars = names(coefi)
+  mat[,xvars] %*% coefi
 }
 ```
 

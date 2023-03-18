@@ -55,7 +55,9 @@ df <- df[,-1]
 ```
 
 \section{LASSO}
-We can start this practicum with one of the methods we discovered during the last lecture: the LASSO. As you have learnt, the LASSO implicitly performs feature selection.
+
+We can start this practicum with one of the methods we discovered during the last lecture: the LASSO.
+As you have learnt, the LASSO implicitly performs feature selection.
 
 ```{r}
 x_var <- data.matrix(df[,-1])     # NOTE: glmnet requires a matrix structure
@@ -142,7 +144,7 @@ For instance, we can start by splitting the observations into a training set and
 dim(df)
 
 set.seed(1)
-train=sample(1:nrow(df), round(nrow(df)*0.8), rep=F)
+train = sample(1:nrow(df), round(nrow(df)*0.8), rep=F)
 test = which(!(1:nrow(df) %in% train))
 
 length(test)

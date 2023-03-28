@@ -1,7 +1,7 @@
 ---
 title: "*Feature Screening*"
 author: "F. Chiaromonte (48.5%), L. Insolia (48.5%), L. Testa (1%)"
-date: "March 16th 2023"
+date: "March 23rd 2023"
 output:
   pdf_document:
     toc: true
@@ -13,7 +13,6 @@ urlcolor: blue
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) # just to clean the pdf files, not recommended in practice!
 ```
-
 
 \section{Introduction}
 
@@ -47,7 +46,7 @@ We will also analyze Leukemia data (with a binary response) that are provided in
 Let's generate some data with strong signals and low collinearity:
 ```{r}
 
-set.seed(1)
+set.seed(1) # Do you remember this command???
 
 n <- 100   # obs
 p <- 2000  # predictors
@@ -73,6 +72,8 @@ head(scorx)
 tail(scorx)
 plot(1:(p*(p-1)/2), scorx, type="l")
 abline(h=0, col="red", lty=2) 
+
+hist(scorx)
 
 # plot correlations in X (just take 50 predictors at random)
 randp <- sample(1:p, 50)
@@ -100,8 +101,7 @@ x.train <- X
 ```
 
 Let's check the SIS function.
-It first implements the Iterative Sure Independence Screening for different variants of
-(I)SIS, and then fits the final regression model using the R packages ncvreg and glmnet for the SCAD/MCP/LASSO regularized loglikelihood for the variables picked by (I)SIS.
+It first implements the Iterative Sure Independence Screening for different variants of (I)SIS, and then fits the final regression model using the R packages ncvreg and glmnet for the SCAD/MCP/LASSO regularized loglikelihood for the variables picked by (I)SIS.
 
 ```{r}
 help(SIS)
@@ -183,7 +183,7 @@ modelLasso = glmnet(x.train, y.train, standardize = F,
 Lassocoef <- which(coef(modelLasso) != 0)
 Lassocoef
 
-# compare them with ISIS
+# compare them with SIS
 Lassocoef %in% model1$ix
 
 # compare them with ISIS
@@ -271,6 +271,8 @@ head(scorx)
 tail(scorx)
 plot(1:(p*(p-1)/2), scorx, type="l")
 abline(h=0, col="red", lty=2) 
+
+hist(scorx)
 
 # plot correlations in X (just take 50 predictors at random)
 randp <- sample(1:p, 50)

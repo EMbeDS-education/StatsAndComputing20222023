@@ -1,0 +1,1688 @@
+---
+title: "Understanding Diabetes Datasets: A Comparative Analysis"
+author: "Daniele Lotito"
+format: html
+editor: visual
+---
+
+## Abstract
+
+This report focuses on the analysis of three diabetes datasets: Stanford, Pima Indians, and Iraqi society. 
+Through an exploratory analysis, we aim to identify differences and potential disparities within the data sets, emphasizing variations in sample characteristics, variable meanings, and definitions of response variables.
+Using statistical learning methods, our analysis seeks to highlight discrepancies between data sets and the need for rigorous examination of data quality, transparency, and proper documentation. Thus, the goal of this report is not to discover new findings on diabetes per se. By providing insights into the complexities of these datasets, we also intend to contribute to the understanding of the appropriate use of data and promote data-driven approaches in research.
+
+
+## Background
+
+We explore three datasets about diabetes, all the datasets have drawn attention from the public, but even a simple exploratory analysis reveals that
+
+1.  There are only few common features
+
+2.  The meaning of some features is not properly explained
+
+3.  The response variable are defined differently
+
+
+## Motivation
+
+Hence, we aim at
+
+1.  Identify differences in the datasets, only looking at the data and at the information made available by the data collectors
+
+2.  Apply different statistical methods to all the datasets in order to highlight differences between eventually comparable data points of them
+
+3.  Warn about potential misuses of the datasets
+
+
+## Datasets used
+
+Three diabetes datasets:
+
+-   Stanford dataset-  from the "Least angle regression" paper by Hastie et al.
+
+-   Pima Indian dataset - collected by (Indian) National Institute of Diabetes and Digestive and Kidney Diseases
+
+-   Iraqi society dataset - collected the laboratory of Medical City Hospital of Baghdad
+
+::: footer
+Sources:\
+Stanford. Efron, B., Hastie, T., Johnstone, I., & Tibshirani, R. (2004). Least angle regression, [Dataset source on Stanford Edu](https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html)\
+Pima Indian. (2016) [Dataset source on Kaggle](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)\
+Iraqi society.   (2020)[Dataset source on Mendeley](https://data.mendeley.com/datasets/wj9rwkp9c2/1)
+:::
+
+## Stanford Dataset
+
+The dataset includes ten variables, that are: 
+-     age
+-     sex
+-     body mass index
+-     average blood pressure
+-     six blood serum measurements
+
+They refer to 442 diabetes patients.
+It also includes the response of interest, a measure of disease progression one year after baseline. All variables are mean centered and scaled by the standard deviation times the square root of n.
+
+::: footer
+Source: Efron, B., Hastie, T., Johnstone, I., & Tibshirani, R. (2004). Least angle regression.
+:::
+
+## Data Import and Initial Exploration
+
+Let's import the dataset and explore the data.
+
+```{r}
+stan <- read.csv("./diabetes_stan.csv", sep = " ")
+(head(stan)[,c("age", "sex", "map", "y")])
+```
+
+We perform a thorough exploration of the data, though, for brevity, we'll only present the most salient findings.
+
+## Preliminary Observations
+
+-   The sex variable is normalized, and it's unclear which group represents the base group.
+-   The response variable, a quantitative measure of disease progression, lacks a clear computation method.
+-   All data points pertain to individuals diagnosed with diabetes.
+
+::: footer
+Additional dataset resources:\
+Extended version with interactions at [Stanford Edu](https://hastie.su.domains/Papers/LARS/data64.txt)\
+Unnormalized version at [Stanford Edu](https://hastie.su.domains/Papers/LARS/diabetes.data)\
+Original paper's dataset at [Stanford Edu](https://hastie.su.domains/Papers/LARS/diabetes.sdata.txt)
+:::
+
+## Iraqi Society Dataset {.section}
+
+This dataset concerns the Iraqi community, consisting of medical information and  laboratory analysis. Specifically, it includes:
+
+-   Patient Number
+-   Blood Sugar Level
+-   Age
+-   Gender
+-   Creatinine Ratio (Cr)
+-   Body Mass Index (BMI)
+-   Urea
+-   Cholesterol (Chol)
+-   Fasting Lipid Profile (including LDL, VLDL, Triglycerides(TG), and HDL Cholesterol)
+-   HBA1C
+-   Diabetes Disease Class (Diabetic, Non-Diabetic, or Predict-Diabetic)
+
+The dataset has data from 103 non-diabetic, 53 predicted-diabetic, and 844 diabetic patients.
+
+::: footer
+Source: Iraqi society.   (2020)[Dataset on Mendeley](https://data.mendeley.com/datasets/wj9rwkp9c2/1)
+:::
+
+
+## Importing and Exploring Data {.section}
+
+Here, we'll begin by importing the dataset and taking a preliminary look at the data.
+
+```{r}
+iraqi <- read.csv("./diabetes_iraqi.csv")
+head(iraqi)[,c("AGE", "Gender", "BMI", "CLASS")]
+```
+## Preliminary Observations
+
+-   The gender variable is character coded, we should transform it to compare with the sex feature of the Stanford dataset
+-   The response variable can assume three values, character coded and is not clear the meaning of predict-diabetic class
+
+
+
+## Pima Indians Dataset {.section}
+
+The Pima Indians is related to women of Pima ethnic group. This dataset provides detailed descriptions of the variables:
+
+-   Pregnancies: Number of times pregnant
+-   Glucose: Plasma glucose concentration 2 hours after an oral glucose tolerance test
+-   BloodPressure: Diastolic blood pressure (mm Hg)
+-   SkinThickness: Triceps skinfold thickness (mm)
+-   Insulin: 2-Hours serum insulin (mu U/ml)
+-   BMI: Body mass index (weight in kg/(height in m)\^2)
+-   DiabetesPedigreeFunction: Diabetes pedigree function
+-   Age: Age (years)
+-   Outcome: Class variable (0 is non-diabetic and 1 diabetic)
+
+This dataset includes medical and general information of 768 Pima Indian women, 268 of them have diabetes.
+
+:::footer
+Source: Pima Indian. (2016) [Dataset on Kaggle](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)
+:::
+
+## Comparing Datasets {.section}
+
+We observe that the Stanford and Pima Indians datasets have some common features, such as BMI and blood pressure.
+
+```{r}
+pima <- read.csv("./diabetes_pima.csv")
+(head(pima)[,c("Age", "BloodPressure", "BMI" )])
+```
+
+## Selecting and Renaming Variables {.section}
+
+To facilitate comparison, we create a subset of the Pima dataset with specific columns and rename them accordingly.
+
+```{r}
+pima_o <- subset(pima, select = c(Age, BMI, BloodPressure, Glucose, Insulin, Outcome))
+colnames(pima_o) <- c("age", "bmi", "BloodP", "glu1", "insulin", "diabetes")
+```
+
+
+## Preliminary observations ans considerations {.section}
+
+It's important to remember that "BloodP" in the Pima dataset represents systolic pressure, which isn't directly comparable to the mean arterial pressure ("map") in the Stanford dataset. Additionally, the glucose measurement in the Pima dataset is taken two hours after an oral glucose load test, which doesn't align with the glucose measurements in the Stanford dataset. Finally, all data points correspond to women.
+
+
+## Data Preprocessing - Iraqi Dataset {.section}
+
+We take the Stanford dataset as baseline and start preprocessing the Iraqi dataset.
+We transform the column names to lowercase for uniformity and ease of use. In addition, we order and normalize the dataframe similar to the Stanford dataset.
+
+```{r}
+# Lowercase transformation and renaming
+names(iraqi)[1:13] <- tolower(names(iraqi)[1:13])
+names(iraqi)[3] <- "sex"
+
+# Ordering and normalization
+iraqi_o <- iraqi[c("age", "bmi", "chol", "ldl","hdl","vldl","hba1c")]
+
+iraqi_o <- data.frame(scale(iraqi_o))
+
+iraqi_o <- cbind(iraqi_o["age"] , c(iraqi["sex"]), c(iraqi_o[c("bmi", "chol", "ldl","hdl")]), iraqi["CLASS"])
+```
+### Checking for duplicates
+Iraqi has duplicated entries.
+```{r}
+#we remove only the ids variables and find duplicates
+iraqi_d <- iraqi[, !(names(iraqi) %in% c("id", "no_pation"))]
+
+# Check for duplicates in iraqi_o dataset
+duplicates <- iraqi_d[duplicated(iraqi_d), ]
+
+# Print the duplicates
+print(summary(duplicates)[1])
+```
+
+
+### Removing the duplicates
+We have also checked that Stanford and Pima datasets do not have duplicates, we remove duplicated values from the iraqi dataset.
+```{r}
+# Remove duplicates from iraqi_o dataset
+iraqi_o <- iraqi_o[!duplicated(iraqi_o), ]
+```
+
+## Data Preprocessing - Categorical Variables {.section}
+
+In our dataset, we use males as the base group for the 'sex' variable. Additionally, we perform some minor adjustments to the 'CLASS' variable for consistency.
+
+```{r}
+# Adjusting 'sex' variable
+library(plyr)
+iraqi_o$sex <- revalue(iraqi_o$sex, c("F"=1, "f"=1, "M"=0))
+
+# Adjusting 'CLASS' variable
+iraqi_o$CLASS <- revalue(iraqi_o$CLASS, c("Y "="Y", "N "="N"))
+```
+
+## Exploring Categorical Variables {.section}
+
+Now, let's visualize the distribution of our categorical variables 'sex' and 'CLASS' using basic plots.
+
+```{r}
+library(ggplot2)
+
+
+# Plotting 'sex' variable
+ggplot(iraqi_o, aes(x = reorder(sex, sex, function(x) -length(x)))) +
+  geom_bar(fill = 'red') +
+  labs(x = 'Sex', y = 'Count') +
+  labs(title = 'Distribution of Sex Variable in Iraqi Dataset') +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+# Plotting 'CLASS' variable
+ggplot(iraqi_o, aes(x = reorder(CLASS, CLASS, function(x) -length(x)))) +
+  geom_bar(fill = 'blue') +
+  labs(x = 'Class', y = 'Count') +
+  labs(title = 'Distribution of Class Variable in Iraqi Dataset') +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+## Data Preprocessing - Outlier Detection and Removal {.section}
+
+Rajput, M. R., & Khedgikar, S. S. (2022) point out that we have to remove outliers, as the dataset contains wrong data entered mistakenly in the database.
+First, we visualize our data with a boxplot to identify potential outliers.
+
+```{r}
+boxplot(iraqi_o[c("bmi","chol","ldl", "hdl")],col = "lightblue", main = "Box Plot - Iraqi Dataset")
+```
+:::footer
+Rajput, M. R., & Khedgikar, S. S. (2022). "Diabetes prediction and analysis using medical attributes: A Machine learning approach". Journal of Xi'an University of Architecture & Technology, 14(1), 98-103
+:::
+
+## Checking for Asymmetries {.section}
+
+We suspect that the distributions of the variables "ldl" and "hdl" might be highly asymmetric. Let's verify this with histograms.
+
+```{r}
+par(mfrow=c(1,2))
+hist(iraqi_o$ldl,breaks=14)
+hist(iraqi_o$hdl,breaks=14)
+```
+
+
+## Outliers or Not? {.section}
+
+Looking at the distribution of 'hdl' across different classes, we observe that the number of outliers is roughly proportional to the number of people in the class.
+This fact is in accordance to the errors in the trascription of data.
+
+```{r}
+ggplot(iraqi_o, aes(x = hdl)) + 
+  geom_histogram(bins=14) + 
+  facet_wrap(vars(CLASS))
+```
+
+## Outlier Removal and Scaling of the Dataset {.section}
+
+
+#### Outlier Removal {.section}
+
+We remove the outliers and then check the histogram again.
+
+```{r}
+no_outliers <- iraqi_o[!rowSums(abs(iraqi_o[c("bmi","chol","ldl", "hdl")])>3.5), ]
+par(mfrow=c(1,2))
+hist(no_outliers$ldl,breaks=14)
+hist(no_outliers$hdl,breaks=14)
+
+iraqi_o<- no_outliers
+```
+#### Dataset scaling
+
+We now scale the dataset in order to compare it with the Stanford dataset.
+
+```{r}
+iraqi_o[c("bmi","chol","ldl", "hdl")] <- data.frame(scale(iraqi_o[c("bmi","chol","ldl", "hdl")]))/(nrow(iraqi_o)^(0.5))
+
+head(iraqi_o)
+```
+
+::: footer
+Rajput, M. R., & Khedgikar, S. S. (2022). [Dataset source on Mendeley](https://data.mendeley.com/datasets/wj9rwkp9c2/1)
+:::
+## Pima Indians Dataset Visualization and Outlier Management {.section}
+
+We have a good understanding of the variables in the Pima Indians dataset and the Stanford dataset, both of which include features such as BMI and blood pressure. However, they are not directly comparable due to differences in their measurements. 
+We explore the response variable
+```{r}
+library(ggplot2)
+
+# Create a histogram of diabetes feature distribution
+ggplot(pima_o, aes(x = diabetes)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(x = "Diabetes", y = "Count") +
+  labs(title = "Distribution of Diabetes Feature in Pima Dataset") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+## Normalizing the Data {.section}
+
+To accurately compare the datasets, we need to ensure the normalization process is consistent.
+
+```{r}
+pima_o[, 1:(ncol(pima_o)-1)] <- scale(pima_o[, 1:(ncol(pima_o)-1)]) / sqrt(nrow(pima_o))
+pima_o$diabetes <- factor(pima_o$diabetes)
+```
+
+::: footer
+Pima Indians dataset: [Source](https://archive.ics.uci.edu/ml/datasets/Pima+Indians+Diabetes)
+:::
+
+## Outlier Detection and Management in Pima Dataset{.section}
+
+Let's start by identifying any potential outliers in the Pima dataset by using boxplots.
+
+```{r}
+boxplot(pima_o[, 1:(ncol(pima_o)-1)], outline = TRUE, col = "lightblue", main = "Box Plot - Pima dataset")
+```
+
+Next, we calculate z-scores for each numerical variable in `pima_o`. This method identifies potential outliers based on a threshold (z-score of 3 or above).
+
+```{r}
+z_scores <- apply(pima_o[, 1:(ncol(pima_o)-2)], 2, function(x) abs(scale(x)))
+outliers <- which(z_scores > 4, arr.ind = TRUE)
+if (length(outliers) > 0) {
+  cat("Potential outliers:\n")
+  print(outliers)
+} else {
+  cat("No outliers found.\n")
+}
+```
+
+We can visualize the potential outliers using a scatter plot matrix.
+
+```{r}
+pairs(pima_o[, 1:(ncol(pima_o)-2)], col = "blue", pch = 19)
+```
+
+#### Outlier Removal {.subsubsection}
+
+Having identified the outliers, we can proceed to remove them from `pima_o` and plot the data again.
+
+```{r}
+z_scores <- apply(pima_o[, 1:(ncol(pima_o)-2)], 2, function(x) abs(scale(x)))
+outliers <- which(z_scores > 3.5, arr.ind = TRUE)
+pima_o2 <- pima_o[-outliers[, 1], ]
+pairs(pima_o2[, 1:(ncol(pima_o2)-2)], col = "blue", pch = 19)
+```
+
+Let's create another box plot to see if the outlier removal had an impact.
+
+```{r}
+boxplot(pima_o2[, 1:(ncol(pima_o2)-1)], outline = TRUE, col = "lightblue", main = "Box Plot - Outlier removed Pima dataset")
+```
+
+### Stanford Dataset {.subsection}
+
+
+## Visualizing Outliers in the Stanford Dataset {.section}
+
+We start by visualizing the Stanford dataset and identifying any potential outliers.
+
+```{r}
+stan <- read.csv("./diabetes_stan.csv", sep = " ")
+boxplot(stan[c("bmi", "map", "ldl", "hdl", "glu")], outline = TRUE, col = "lightblue", main = "Box Plot - Stanford Dataset")
+```
+
+## Calculating Z-Scores in the Stanford Dataset {.section}
+
+We will calculate the Z-scores for each numerical variable in the Stanford dataset to identify any potential outliers.
+
+```{r}
+z_scores_stan <- apply(stan[c("bmi", "map", "ldl", "hdl", "glu")], 2, function(x) abs(scale(x)))
+outliers_stan <- which(z_scores_stan > 3.5, arr.ind = TRUE)
+print(outliers_stan)
+```
+
+## Outlier Management in the Stanford Dataset {.section}
+
+We will manage the outliers identified in the Stanford dataset and then visualize the data again to confirm the effectiveness of our outlier management.
+
+```{r}
+stan_o <- stan[-outliers_stan[, 1], ]
+boxplot(stan_o[c("bmi", "map", "ldl", "hdl", "glu")], outline = TRUE, col = "lightblue", main = "Box Plot - Stanford Dataset (Outliers Removed)")
+```
+
+## Further Observations {.section}
+
+Some outliers may still exist. However, these outliers are not as significant as before and may not need to be removed, as confirmed by the boxplot and scatterplot matrix.
+
+```{r}
+pairs(stan_o[c("bmi", "map", "ldl", "hdl", "glu")], col = "blue", pch = 19)
+```
+
+
+
+### Iraqi Dataset {.subsection}
+
+We check again for outliers in the Iraqi dataset, even though we previously managed them.
+
+```{r}
+z_scores <- apply(iraqi_o[c("bmi","chol","ldl", "hdl")], 2, function(x) abs(scale(x)))
+outliers <- which(z_scores > 3.5, arr.ind = TRUE)
+if (length(outliers) > 0) {
+  cat("Potential outliers:\n")
+  print(outliers)
+} else {
+  cat("No outliers found.\n")
+}
+```
+
+Let's visualize the outliers using box plots and scatter plot matrices.
+
+```{r}
+boxplot(iraqi_o[c("bmi","chol","ldl", "hdl")], outline = TRUE, col = "lightblue", main = "Box Plot - iraqi_o")
+pairs(iraqi_o[c("bmi","chol","ldl", "hdl")], col = "blue", pch = 19)
+```
+
+## Preprocessing section, conclusion
+
+In the outlier detection and management process, we explored the Pima, Stanford, and Iraqi datasets. We used box plots, z-scores, and scatter plot matrices to identify potential outliers. We then removed the outliers and visualized the data again. In the case of the Iraqi dataset, the previous outlier management proved effective.
+
+## Feature Relevance Analysis {.section}
+
+### Data Exploration {.subsection}
+
+Having completed the preprocessing steps, we now have our three datasets: Stanford, Pima Indians, and Iraqi. Among these datasets, only age and BMI are common features. Furthermore:
+
+-   Stanford and Iraqi datasets share LDL and HDL as common features.
+-   Iraqi and Pima Indians datasets share LDL and HDL as common features.
+-   Stanford and Pima Indians datasets share glucose and blood pressure measurements, but these measurements are taken in different clinical settings, thus these features are not comparable, at least without using domain knowledge.
+
+### Summary Table {.subsection}
+
+We summarize the common features in the following table: 
+![](./table1.png){width="600"}
+
+
+
+## Assessing relevance of "age" and "bmi"{.subsection}
+
+We want to determine the relevance of "age" and "bmi" in each dataset. We can explore this issue using various statistical tools, such as PCA analysis.
+
+### Standardization Check {.subsection}
+
+To ensure consistency, let's standardize the datasets:
+
+```{r}
+stan_std <- stan
+stan_std[c("age","bmi", "map", "ldl", "hdl", "glu")] <- scale(stan_std[c("age","bmi", "map", "ldl", "hdl", "glu")])
+
+pima_std <- pima_o2
+pima_std[c("age", "bmi","BloodP", "glu1", "insulin")] <- scale(pima_std[c("age", "bmi","BloodP", "glu1", "insulin")]) 
+
+iraqi_std <- iraqi_o
+iraqi_std[c("bmi","chol","ldl", "hdl")] <- scale(iraqi_std[c("bmi","chol","ldl", "hdl")])
+
+```
+### Checking for duplicated values
+
+We check again for duplicates. We find that upon removal of some features new duplicates arise in the Iraqi dataset.
+```{r}
+# Check for duplicates in the entire dataset
+duplicates <- duplicated(stan_std)
+
+# Print the duplicated rows
+duplicated_rows <- stan_std[duplicates, ]
+print(duplicated_rows)
+
+
+# Check for duplicates in the entire dataset
+duplicates <- duplicated(pima_std)
+
+# Print the duplicated rows
+duplicated_rows <- pima_std[duplicates, ]
+print(duplicated_rows)
+
+
+# Check for duplicates in the entire dataset
+duplicates <- duplicated(iraqi_std)
+
+# Print the duplicated rows
+duplicated_rows <- iraqi_std[duplicates, ]
+print(duplicated_rows)
+```
+### About duplicates in Iraqi dataset
+As duplicates are in subsequent rows and concerns multiple continuous-valued feature, we think that these are true duplicates that escaped from the previous check due to a partial modification of them.
+
+```{r}
+# Remove duplicates and NaN values from the iraqi_std dataset
+iraqi_std <- iraqi_std[!duplicated(iraqi_std), ]
+iraqi_std <- iraqi_std[complete.cases(iraqi_std), ]
+
+duplicates <- duplicated(iraqi_std)
+duplicated_rows <- iraqi_std[duplicates, ]
+print(duplicated_rows)
+```
+
+
+
+### Preliminary Observations {.subsection}
+
+Let's start by visualizing the distribution of "age" and "bmi" in each dataset using scatter plots:
+
+```{r}
+ggplot(stan_std, aes(x = age, y = bmi)) +
+  geom_point(color = "blue") +
+  labs(title = "Stanford Dataset - Age vs. BMI")
+
+ggplot(pima_std, aes(x = age, y = bmi)) +
+  geom_point(color = "red") +
+  labs(title = "Pima Dataset - Age vs. BMI")
+
+ggplot(iraqi_std, aes(x = age, y = bmi)) +
+  geom_point(color = "green") +
+  labs(title = "Iraqi Dataset - Age vs. BMI")
+```
+
+### Correlation Analysis {.subsection}
+
+Next, let's examine the correlation between "age" and "bmi" in each dataset:
+
+```{r}
+correlation_stan <- cor(stan_std[, c("age", "bmi")])
+correlation_pima <- cor(pima_std[, c("age", "bmi")])
+correlation_iraqi <- cor(iraqi_std[, c("age", "bmi")])
+
+print("Stanford Dataset - Correlation:")
+print(correlation_stan)
+
+print("Pima Dataset - Correlation:")
+print(correlation_pima)
+
+print("Iraqi Dataset - Correlation:")
+print(correlation_iraqi)
+```
+
+### Regression and Classification {.subsection}
+
+We will now assess the relevance of "age" and "bmi" in regression and classification tasks for each dataset.
+
+#### Regression in the Stanford Dataset {.subsubsection}
+
+```{r}
+library(caret)
+# Regression Analysis on Stanford Dataset
+predictors_stan <- stan_std[, c("age", "bmi")]
+response_stan <- stan_std$y
+
+fit_stan <- train(predictors_stan, response_stan, method = "lm")
+
+print(summary(fit_stan$finalModel))
+
+```
+#### Binary Classification in the Pima Dataset {.subsubsection}
+
+```{r}
+# Classification Analysis on Pima Dataset
+predictors_pima <- pima_std[, c("age", "bmi")]
+response_pima <- pima_std$diabetes
+
+fit_pima <- train(predictors_pima, response_pima, method = "glm", family = "binomial")
+
+print(summary(fit_pima$finalModel))
+```
+
+## Multiclass Classification in the Iraqi Dataset {.section}
+
+The Iraqi dataset includes the "CLASS" feature, which represents the patient's diabetes disease class and can take the values "Y" (Diabetic), "N" (Non-Diabetic), or "P" (Predict-Diabetic).
+
+To perform multiclass classification, we can use ordered logistic regression. However, as the outcome variable is qualitative and ordered, we can also consider converting it to a numerical variable. We assign 0 to "N", 1 to "P", and 2 to "Y". It is important to note that some classification algorithms, such as decision trees or random forests, can handle qualitative ordered variables directly without conversion.
+
+### Ordered Logistic Regression {.subsection}
+
+Let's attempt to use ordered logistic regression on the Iraqi dataset.
+
+```{r}
+# Load required libraries
+library(MASS)
+
+# Convert outcome variable to ordered factor
+iraqi_std$CLASS <- factor(iraqi_std$CLASS, levels = c("N", "P", "Y"), ordered = TRUE)
+
+# Define predictor variables and ordered response variable
+predictors_iraqi <- iraqi_std[, c("age", "bmi")]
+response_iraqi <- iraqi_std$CLASS
+
+# Perform ordinal logistic regression using polr function
+fit_iraqi <- polr(response_iraqi ~ age + bmi, data = iraqi_std)
+
+# Print model summary
+summary(fit_iraqi)
+```
+
+### Interpretation of Coefficients {.subsection}
+
+Let's interpret the coefficients obtained from the ordinal logistic regression.
+
+- `age` coefficient: The coefficient for the `age` predictor variable has the following interpretation. Holding all other variables constant, a one-unit increase in age is associated with an increase in the log-odds of moving to a higher category (e.g., from "N" to "P" or from "P" to "Y" due to the proportional odds assumption) by its value. The positive coefficient suggests that older age is associated with a higher likelihood of moving to a higher category.
+- `bmi` coefficient. Similarly, holding all other variables constant, a one-unit increase in BMI is associated with an increase in the log-odds of moving to a higher category by its value. The positive coefficient indicates that higher BMI is associated with a higher likelihood of moving to a higher category.
+
+For both predictors t-value > 2, they are significant predictors for the class.
+We will see 
+
+
+### Interpretation of Intercepts {.subsection}
+
+Let's interpret the intercepts obtained from the ordinal logistic regression.
+
+- `N|P` intercept. This intercept represents the log-odds of being in the "N" category compared to the reference category "P" (i.e., the base category). A negative intercept suggests a higher likelihood of being in the "N" category compared to the "P" category.
+- `P|Y` intercept. This intercept represents the log-odds of being in the "P" category compared to the "Y" category. A negative intercept indicates a higher likelihood of being in the "P" category compared to the "Y" category.
+
+:::footer
+https://stats.oarc.ucla.edu/other/mult-pkg/faq/ologit/
+:::
+
+### Appropriateness of the model
+Ordinal logistic (and ordinal probit) regression relies on the assumption that the relationships between each successive pair of outcome groups are consistent. This means that the coefficients describing the relationship between the lowest and all higher outcome groups should be the same as those for the next lowest and all higher categories, and so forth. This principle is known as the proportional odds assumption or parallel regression assumption. Since the relationships between all pairs of groups are identical, there's only one set of coefficients needed. If this wasn't the case, we'd need separate sets of coefficients to describe each pairwise relationship between outcome groups.
+
+To ensure our model is suitable, we need to check if the proportional odds assumption holds. Although some software packages offer statistical tests to evaluate this, these tests have been critiqued for being overly likely to disprove the null hypothesis (i.e., the sets of coefficients excluding the intercept are identical), suggesting the parallel slopes assumption doesn't hold, even when it does (refer to Harrell 2001 p. 335). We decided not to conduct any tests on this parallel assumption in R as there isn't a widely recognized method for doing so, to the best of our knowledge.
+
+In our subsequent cluster analysis, we'll observe indications that this assumption may not hold, as the "Y" class appears to differ fundamentally from the others.
+
+:::footer
+-  https://www.karlin.mff.cuni.cz/~pesta/NMFM404/ordinal.html
+-  Harrell Jr, F. E. (2001) Regression Modeling Strategies at https://hbiostat.org/doc/rms.pdf
+:::
+
+### Assessment of the relevance of age and bmi features
+In all three datasets both bmi and age are relevant in the relevant tasks, except for feature age in the Stanford dataset.
+
+## Principal Component Analysis (PCA) on the Datasets {.section}
+
+PCA is a dimensionality reduction technique used for data analysis. Let's perform PCA on each dataset separately and assess the loading of "bmi" and "age" on the first PCA components.
+
+### Stanford Dataset {.subsection}
+
+```{r}
+# Perform PCA on Stanford dataset, excluding the "sex" variable
+stan_pca <- prcomp(stan_std[, c(1, 3:(ncol(iraqi_std)-1))])
+
+# Print the loading of "bmi" and "age" on the first PCA component
+print(stan_pca$rotation[, 1])
+```
+
+### Pima Dataset {.subsection}
+
+```{r}
+# Perform PCA on Pima dataset
+pima_pca <- prcomp(pima_std[, -ncol(pima_std)])
+
+# Print the loading of "bmi" and "age" on the first PCA component
+print(pima_pca$rotation[, 1])
+```
+
+### Iraqi Dataset {.subsection}
+
+```{r}
+# Perform PCA on Iraqi dataset, excluding the "sex" variable
+iraqi_numeric <- iraqi_std[, sapply(iraqi_std, is.numeric)]
+iraqi_pca <- prcomp(iraqi_numeric)
+
+# Print the loading of "bmi" and "age" on the first PCA component
+print(iraqi_pca$rotation[, 1])
+```
+
+### Observation {.subsection}
+
+From the PCA results, we observe the loadings of "bmi" and "age" on the first PCA component for each dataset. It appears that these variables have relevant loadings, while other variables such as "tc" in the Stanford dataset and "vldl" in the Iraqi dataset have less importance. However, "bmi" and "age" alone do not "explain" the variation of the data considered. This is a clear sign that other features matter.
+
+## Clustering on the Stanford Dataset {.section}
+
+Let's perform k-means clustering on the Stanford dataset and visualize the clusters.
+
+```{r}
+set.seed(314)
+# Perform k-means clustering on the Stanford dataset, we exclude the sex feature
+stan_clusters <- kmeans(stan_std[c(1, 3:(ncol(stan_std)-1))], centers = 3)
+
+# Retrieve cluster assignments
+stan_cluster_assignments <- stan_clusters$cluster
+```
+
+## Visualization of Clusters on the Stanford Dataset {.subsection}
+
+```{r}
+set.seed(314)
+# Perform PCA on the Stanford dataset
+stan_pca <- prcomp(stan_std[, c(1, 3:(ncol(stan_std)-1))])
+
+# Obtain PCA scores for the first two components
+stan_pca_scores <- as.data.frame(stan_pca$x[, 1:2])
+
+# Add cluster assignments to the PCA scores dataframe
+stan_pca_scores$cluster <- stan_cluster_assignments
+
+# Plot the clusters on the first two PCA components
+plot(x = stan_pca_scores$PC1, y = stan_pca_scores$PC2, col = stan_pca_scores$cluster, pch = 19, 
+     xlab = "PC1", ylab = "PC2", main = "Clustering Results - Stanford Dataset")
+
+# Add legend
+legend("topright", legend = unique(stan_cluster_assignments), col = unique(stan_cluster_assignments), 
+       pch = 19, title = "Clusters")
+```
+
+In the visualization, each point represents a data point from the Stanford dataset, and the color represents the cluster assignment. The clustering helps identify patterns and groupings within the data based on the variables used in the analysis.
+
+
+## Clustering on BMI and Age
+
+We want to understand if the clustering happens to group along the "y" (disease progression) axis. We choose a second variable to plot.
+
+```{r}
+# Create a scatter plot of BMI vs. Age with color-coded clusters
+plot(x = stan_std$age, y = stan_std$bmi, col = stan_cluster_assignments, pch = 19,
+     xlab = "Age", ylab = "BMI", main = "Clustering Results - BMI vs Age (Stanford Dataset)")
+
+# Add legend
+legend("topright", legend = unique(stan_cluster_assignments), col = unique(stan_cluster_assignments),
+       pch = 19, title = "Clusters")
+```
+
+## Clustering on Age and y
+
+
+We plot the relationship between "age" and "y" with color-coded clusters.
+
+```{r}
+# Create a scatter plot of "y" vs. "BMI" with color-coded clusters
+plot(x = stan_std$age, y = stan_std$y, col = stan_cluster_assignments, pch = 19,
+     xlab = "age", ylab = "y", main = "Clustering Results - y vs age (Stanford Dataset)")
+
+# Add legend
+legend("topright", legend = unique(stan_cluster_assignments), col = unique(stan_cluster_assignments),
+       pch = 19, title = "Clusters")
+```
+
+
+## Clustering on BMI and y
+
+
+We plot the relationship between "bmi" and "y" with color-coded clusters.
+
+```{r}
+# Create a scatter plot of "y" vs "BMI" with color-coded clusters
+plot(x = stan_std$bmi, y = stan_std$y, col = stan_cluster_assignments, pch = 19,
+     xlab = "BMI", ylab = "y", main = "Clustering Results - y vs BMI (Stanford Dataset)")
+
+# Add legend
+legend("topright", legend = unique(stan_cluster_assignments), col = unique(stan_cluster_assignments),
+       pch = 19, title = "Clusters")
+```
+
+## 3D plot with BMI, Age, and y
+
+We create a 3D plot with BMI, Age, and y to visualize their relationships.
+
+```{r}
+# Load the required packages
+library(plotly)
+
+# Create a scatterplot3d object
+scatter <- plot_ly(data = stan_std, x = ~bmi, y = ~age, z = ~y, color = ~factor(stan_cluster_assignments), colors = c("black","red","darkgreen"),
+                   type = "scatter3d", mode = "markers", marker = list(size = 4))
+
+# Customize the layout
+scatter <- scatter %>% layout(scene = list(xaxis = list(title = "BMI"),
+                                           yaxis = list(title = "Age"),
+                                           zaxis = list(title = "Y")),
+                               legend = list(title = "Clusters"))
+
+# Show the interactive 3D plot
+scatter
+```
+
+
+## BMI before age
+"bmi" feature is more important than "age" feature, that in the regression task is not an important regressor, as we will also see later on.
+This is a hint about the fact that once you have diabetes, being younger does not help as much as conducting a healthy lifestyle that affect directly the other regressors that prove to be more relevant than "age".
+
+## Dynamic and interactive visualization
+
+To create dynamic and interactive visualization, we can utilize the Shiny framework along with the `plotly` and `factoextra` packages. The following code demonstrates the integration of Shiny to create a slider input for selecting the number of clusters, performing clustering using k-means, computing PCA on the data, and updating the 3D scatter plot based on the selected number of clusters.
+Note that this visualisation cannot work on an html file, you can run it in RStudio uncommenting the last code line.
+
+```{r}
+library(shiny)
+library(plotly)
+library(factoextra)
+
+# Perform k-means clustering
+performClustering <- function(data, k) {
+  clusters <- kmeans(data, centers = k)
+  return(clusters$cluster)
+}
+
+# Compute PCA on the data
+stan_pca <- prcomp(as.matrix(stan_std[, c(1, 3:(ncol(stan_std)-1))]))
+
+# Update the plot based on the selected number of clusters
+updatePlot <- function(num_clusters) {
+  # Perform clustering
+  cluster_assignments <- performClustering(as.matrix(stan_std[, c(1, 3:(ncol(stan_std)-1))]), num_clusters)
+  
+  # Create a data frame with PCA scores and cluster assignments
+  df <- data.frame(PC1 = stan_pca$x[, 1],
+                   PC2 = stan_pca$x[, 2],
+                   y = stan_std$y,
+                   Cluster = factor(cluster_assignments))
+  
+  # Create the scatter plot
+  scatter <- plot_ly(data = df, x = ~PC1, y = ~PC2, z = ~y,
+                     color = ~Cluster, type = "scatter3d", mode = "markers",
+                     marker = list(size = 3))
+  
+  # Customize the layout
+  scatter <- scatter %>% layout(scene = list(xaxis = list(title = "PCA1"),
+                                             yaxis = list(title = "PCA2"),
+                                             zaxis = list(title = "y")),
+                                             legend = list(title = "Clusters"))
+  
+  return(scatter)
+}
+
+# Create the UI
+ui <- fluidPage(
+  sliderInput(inputId = "num_clusters", label = "Number of Clusters",
+              min = 2, max = 10, value = 3, step = 1),
+  plotlyOutput(outputId = "scatterplot")
+)
+
+# Create the server
+server <- function(input, output) {
+  # Update the plot when the number of clusters is changed
+  observeEvent(input$num_clusters, {
+    updated_plot <- updatePlot(input$num_clusters)
+    output$scatterplot <- renderPlotly(updated_plot)
+  })
+}
+
+# Run the Shiny app
+#shinyApp(ui, server)
+```
+
+## On Iraqi dataset
+
+To visualize the Iraqi dataset, we first address the issue of class imbalance by performing downsampling. We then compute PCA on the downsampled dataset and perform k-means clustering. Finally, we create a scatter plot using `plotly` to visualize the first two PCA components, color-coded by clusters and symbols representing the class labels.
+
+## Downsampling first
+
+```{r}
+library(caret)
+
+# Create a data frame with the independent variables (features) and the dependent variable (CLASS)
+data <- iraqi_std[, c("age", "sex", "bmi", "chol", "ldl", "hdl", "CLASS")]
+
+# Check the class distribution
+#table(data$CLASS)
+
+# Downsample the dataset
+downsampled_iraqi <- downSample(data[, -ncol(data)], data$CLASS)
+
+# Check the class distribution of the downsampled dataset
+table(downsampled_iraqi$Class)
+
+```
+
+## Visualization on the first two PCA components
+
+```{r}
+library(plotly)
+library(caret)
+
+# Perform k-means clustering
+performClustering <- function(data, k) {
+  clusters <- kmeans(data, centers = k)
+  return(clusters$cluster)
+}
+
+# Compute PCA on the data
+iraqi_pca <- prcomp(downsampled_iraqi[, c("age", "bmi", "chol", "ldl", "hdl")])
+
+# Perform clustering
+set.seed(314)
+num_clusters <- 3
+cluster_assignments <- performClustering(downsampled_iraqi[, c("age", "bmi", "chol", "ldl", "hdl")], num_clusters)
+
+# Create a data frame with PCA1, PCA2, Cluster, and Class labels
+df <- data.frame(PCA1 = iraqi_pca$x[, 1],
+                 PCA2 = iraqi_pca$x[, 2],
+                 Cluster = factor(cluster_assignments),
+                 Class = factor(downsampled_iraqi$Class))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue", "3" = "green")
+symbol_mapping <- c("N" = "circle", "P" = "square", "Y" = "diamond")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~PCA1, y = ~PCA2,
+                   color = ~Cluster, colors = color_mapping,
+                   symbol = ~Class, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "PCA1"),
+                              yaxis = list(title = "PCA2"),
+                              legend = list(title = "Clusters"))
+# Show the plot
+scatter
+```
+
+By applying downsampling to address class imbalance and performing PCA and k-means clustering, we can visualize the Iraqi dataset using a scatter plot that represents the first two PCA components. The clusters are color-coded, and the symbols represent the class labels.
+
+## Clustering visualization on Age and BMI
+
+Let's visualize the clustering results on the Age and BMI variables.
+
+```{r}
+library(dplyr)
+
+df <- data.frame(Age = downsampled_iraqi$age,
+                 BMI = downsampled_iraqi$bmi,
+                 Cluster = df$Cluster,
+                 Class = factor(downsampled_iraqi$Class))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue", "3" = "green")
+symbol_mapping <- c("N" = "circle", "P" = "square", "Y" = "diamond")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~Age, y = ~BMI,
+                   color = ~as.character(Cluster), colors = color_mapping,
+                   symbol = ~Class, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "Age"),
+                              yaxis = list(title = "BMI"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+# Count the points
+df %>% count(Cluster, Class)
+```
+
+## Observation on Green Points
+
+We can observe that the green points are easily separable from the other clusters based on the Age and BMI variables.
+
+## Counting Points
+
+Let's count the number of points for each combination of Cluster and Class.
+
+```{r}
+# Compute the count of points for each combination of Cluster and Class
+count_table <- table(df$Cluster, df$Class)
+
+# Compute the row totals (marginals)
+row_totals <- rowSums(count_table)
+
+# Compute the relative frequencies
+relative_freq_table <- prop.table(count_table, margin = 1)
+
+# Add row and column marginals to the relative frequency table
+relative_freq_table_with_marginals <- addmargins(relative_freq_table, margin = 1:2)
+
+# Print the relative frequency table with marginals
+print(relative_freq_table_with_marginals)
+print(count_table)
+```
+
+## Observation
+
+From the table, we can see that it is difficult to distinguish "N" from "P" using only the first two PCA components. To further investigate, let's try performing k-means clustering with only two clusters and see if "N" and "P" are now clustered together.
+
+```{r}
+set.seed(123)
+# Perform k-means clustering with two clusters
+num_clusters <- 2
+cluster_assignments <- performClustering(as.matrix(downsampled_iraqi[, c("age", "bmi", "chol", "ldl", "hdl" )]), num_clusters)
+
+# Create a data frame with Age, BMI, Cluster, and Class labels
+df <- data.frame(Age = downsampled_iraqi$age,
+                 BMI = downsampled_iraqi$bmi,
+                 Cluster = factor(cluster_assignments),
+                 Class = factor(downsampled_iraqi$Class))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue")
+symbol_mapping <- c("N" = "circle", "P" = "square", "Y" = "diamond")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~Age, y = ~BMI,
+                   color = ~as.character(Cluster), colors = color_mapping,
+                   symbol = ~Class, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "Age"),
+                              yaxis = list(title = "BMI"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+```
+
+## Table
+
+With two clusters, we succeed in gruping together "N" and "P", even if not perfectly.
+
+```{r}
+# Compute the count of points for each combination of Cluster and Class
+count_table <- table(df$Cluster, df$Class)
+
+# Print the count table
+print(count_table)
+```
+
+## Agglomerative Hierarchical Clustering
+
+We will now explore a different clustering approach: Agglomerative Hierarchical Clustering.
+
+```{r}
+# Perform Agglomerative Hierarchical Clustering
+hclust_result <- hclust(dist(downsampled_iraqi[, c("age", "bmi", "chol", "ldl", "hdl")]))
+
+# Plot the dendrogram
+plot(hclust_result)
+```
+
+## Counting
+
+From the dendrogram, it appears more natural to divide the data into four clusters. However, to respect the "CLASS" variable, we will cut it into three clusters.
+
+```{r}
+# Perform Agglomerative Hierarchical Clustering
+hclust_result <- hclust(dist(downsampled_iraqi[, c("age", "bmi", "chol", "ldl", "hdl")]))
+
+# Cut the dendrogram to obtain three clusters
+num_clusters <- 3
+cluster_labels <- cutree(hclust_result, k = num_clusters)
+
+# Create the count table
+count_table <- table(cluster_labels, downsampled_iraqi$Class)
+print(count_table)
+```
+
+```{=tex}
+## Latex code for count tables
+
+Below is the LaTeX code for the count tables obtained from Agglomerative Hierarchical Clustering and K-means Clustering on the Iraqi dataset.
+
+\begin{table}[ht]
+\centering
+\caption{Count Table for Agglomerative Hierarchical Clustering, Iraqi dataset}
+\begin{tabular}{lccc}
+\hline
+Cluster & N & P & Y \\
+\hline
+Cluster 1 & 44 & 45 & 10 \\
+Cluster 2 & 9 & 7 & 3 \\
+Cluster 3 & 0 & 1 & 40 \\
+\hline
+\end{tabular}
+\end{table}
+```
+
+```{=tex}
+\begin{table}[ht]
+\centering
+\caption{Count Table for K-means Clustering, Iraqi dataset}
+\begin{tabular}{lccc}
+\hline
+Cluster & N & P & Y \\
+\hline
+Cluster 1 & 2 & 4 & 43 \\
+Cluster 2 & 42 & 38 & 5 \\
+Cluster 3 & 9 & 11 & 5 \\
+\hline
+\end{tabular}
+\end{table}
+```
+
+## Comparing the two clustering approaches
+
+Based on the count tables, we can make the following observations:
+
+1. Balance of clusters: Both clustering methods produce clusters of varying sizes. Agglomerative Hierarchical Clustering shows relatively balanced cluster sizes, while K-means clustering has imbalanced cluster sizes, particularly in Cluster 2.
+
+2. Separation of classes: Both clustering techniques show better separation of the "Y" class compared to the "N" and "P" classes.
+
+These observations provide insights into the effectiveness of different clustering approaches for the Iraqi dataset.
+
+
+## Pima dataset
+
+Given that the "diabetes" variable in the pima_std dataset has imbalanced classes, with 474 instances labeled as "0" and 248 instances labeled as "1," it is recommended to downsample the majority class ("0") to balance the dataset before performing clustering analysis. This will help prevent bias towards the majority class during clustering.
+
+```{r}
+library(caret)
+
+# Downsample the majority class ("0")
+downsampled_pima <- downSample(x = pima_std[, c("age", "bmi", "BloodP", "glu1", "insulin")],
+                               y = pima_std$diabetes,
+                               yname = "diabetes")
+
+# Perform k-means clustering with two clusters
+num_clusters <- 2
+cluster_assignments <- performClustering(as.matrix(downsampled_pima[, c("age", "bmi", "BloodP", "glu1", "insulin")]), num_clusters)
+
+# Create a data frame with Age, BMI, Cluster, and Diabetes labels
+df <- data.frame(Age = downsampled_pima$age,
+                 BMI = downsampled_pima$bmi,
+                 Cluster = factor(cluster_assignments),
+                 Diabetes = factor(downsampled_pima$diabetes))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue")
+symbol_mapping <- c("0" = "circle", "1" = "square")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~Age, y = ~BMI,
+                   color = ~as.character(Cluster), colors = color_mapping,
+                   symbol = ~Diabetes, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "Age"),
+                              yaxis = list(title = "BMI"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+
+```
+
+## Plotting using the first two PCA components
+
+```{r}
+# Compute PCA on the downsampled data
+pima_pca <- prcomp(as.matrix(downsampled_pima[, c("age", "bmi", "BloodP", "glu1", "insulin")]), scale. = TRUE)
+
+# Get the PCA scores for the data
+pima_pca_scores <- predict(pima_pca)
+
+# Create a data frame with PCA1, PCA2, Cluster, and Diabetes labels
+df <- data.frame(PCA1 = pima_pca_scores[, "PC1"],
+                 PCA2 = pima_pca_scores[, "PC2"],
+                 Cluster = factor(cluster_assignments),
+                 Diabetes = factor(downsampled_pima$diabetes))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue")
+symbol_mapping <- c("0" = "circle", "1" = "square")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~PCA1, y = ~PCA2,
+                   color = ~as.character(Cluster), colors = color_mapping,
+                   symbol = ~Diabetes, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "PCA1"),
+                              yaxis = list(title = "PCA2"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+
+
+
+```
+
+## 
+
+## Counting points
+
+```{r}
+# Compute the count of points for each combination of Cluster and Diabetes
+count_table <- table(df$Cluster, df$Diabetes)
+
+# Print the count table
+print(count_table)
+```
+
+We can observe the distribution of the diabetes class points within each cluster. Ideally, we would expect that the clusters reflect the class points, meaning that each cluster predominantly contains points from a specific diabetes class.
+
+In this case, we can see that Cluster 1 has a higher count of points from Class 1 (diabetic) compared to Class 0 (npn-diabetic). However, there is some overlap, as both clusters have points from both classes.
+
+## Further analysis: Agglomerative Hierarchical Clustering
+
+I use euclidean distance metric
+
+```{r}
+# Perform Agglomerative Hierarchical Clustering
+hclust_result <- hclust(dist(downsampled_pima[, c("age", "bmi", "BloodP", "glu1", "insulin")]))
+
+# Plot the dendrogram
+plot(hclust_result)
+
+```
+
+## Cutting the dendogram
+
+```{r}
+# Cut the dendrogram to obtain two clusters
+num_clusters <- 2
+cluster_labels <- cutree(hclust_result, k = num_clusters)
+
+```
+
+## Plotting new clusters
+
+```{r}
+library(plotly)
+# Create a data frame with the necessary columns
+df <- data.frame(BMI = downsampled_pima$bmi,
+                 Age = downsampled_pima$age,
+                 Cluster = factor(cluster_labels),
+                 Diabetes = factor(downsampled_pima$diabetes))
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue")
+symbol_mapping <- c("0" = "circle", "1" = "square")
+
+# Create the scatter plot
+scatter <- plot_ly(data = df, x = ~BMI, y = ~Age,
+                   color = ~as.character(Cluster), colors = color_mapping,
+                   symbol = ~Diabetes, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "BMI"),
+                              yaxis = list(title = "Age"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+
+```
+
+## Doing some counting
+
+```{r}
+# Create the table of cluster counts by diabetes class
+table_clusters <- table(cluster_labels, downsampled_pima$diabetes)
+print(table_clusters)
+```
+
+## Clustering conclusions
+
+From the obtained tables, we can observe the distribution of diabetes class points within each cluster for both clustering approaches.
+
+The first clustering method resulted in clusters that are more balanced in terms of the distribution of diabetes class points. Both clusters contain a substantial number of points from both classes and appear to slightly discriminate according to the response variable. The hierarchical clustering method achieve worse results, as it is not as effective in separating the diabetes classes as the k-means approach.
+
+
+## Merging and looking
+
+We now merge the features "age" and "bmi" of the three datasets and perform k-means clustering based on only these features, with k = 3.
+We want to assess if the clustering approach is able to recover the belonging to the original dataset.
+
+```{r}
+library(dplyr)
+library(cluster)
+set.seed(314)  # Set seed for reproducibility
+
+# Combine age and bmi features of each dataset
+stan_data <- stan_std %>% select(age, bmi)
+iraqi_data <- downsampled_iraqi %>% select(age, bmi)
+pima_data <- downsampled_pima %>% select(age, bmi)
+
+# Perform downsampling to make datasets the same size
+sample_size <- min(nrow(stan_data), nrow(iraqi_data), nrow(pima_data))
+
+stan_sample <- stan_data %>% sample_n(size = sample_size)
+iraqi_sample <- iraqi_data %>% sample_n(size = sample_size)
+pima_sample <- pima_data %>% sample_n(size = sample_size)
+
+# Create a new column to indicate dataset belonging
+stan_sample$Dataset <- "Stanford"
+iraqi_sample$Dataset <- "Iraqi"
+pima_sample$Dataset <- "Pima"
+
+# Merge the datasets
+merged_data <- bind_rows(stan_sample, iraqi_sample, pima_sample)
+
+# Perform k-means clustering
+k <- 3
+clusters <- kmeans(merged_data[, c("age", "bmi")], centers = k)
+
+# Add cluster assignments to the merged data frame
+merged_data$Cluster <- as.factor(clusters$cluster)
+
+
+# Calculate the contingency table
+contingency_table <- table(merged_data$Cluster, merged_data$Dataset)
+
+# Add row and column names for better interpretation
+rownames(contingency_table) <- paste("Cluster", rownames(contingency_table))
+#colnames(contingency_table) <- c("Stanford", "Iraqi", "Pima")
+colnames(contingency_table) <- c("Iraqi", "Pima", "Stan")
+# View the contingency table
+contingency_table
+
+
+```
+## Plotting
+We see that indeed there is a slight indication of memberships.
+We plot with plotly the clusters with different colors for the clustering and different symbols for the memberships. 
+
+```{r}
+library(plotly)
+set.seed(314)  # Set seed for reproducibility
+
+# Define color and symbol mappings
+color_mapping <- c("1" = "red", "2" = "blue", "3" = "green")
+symbol_mapping <- c("Stanford" = "circle", "Iraqi" = "square", "Pima" = "diamond")
+
+# Create the scatter plot
+scatter <- plot_ly(data = merged_data, x = ~age, y = ~bmi,
+                   color = ~as.factor(Cluster), colors = color_mapping,
+                   symbol = ~Dataset, symbols = symbol_mapping,
+                   type = "scatter", mode = "markers")
+
+# Customize the layout
+scatter <- scatter %>% layout(xaxis = list(title = "Age"),
+                              yaxis = list(title = "BMI"),
+                              legend = list(title = "Clusters"))
+
+# Show the plot
+scatter
+
+```
+
+## A lecit question
+
+We may suspect that the one cluster contains mainly diabetic patients.
+These are all the points of stan_std, the points of  downsampled_pima with "diabetes" feature equals to 1 (factor variable) and the points of downsampled_iraqi with "Class"  feature "Y". We want to rebuild the merged_dataset keeping this in mind.  
+
+
+```{r}
+set.seed(314)  # Set seed for reproducibility
+
+# Determine the minimum number of samples among the datasets
+min_samples <- min(nrow(stan_std), nrow(downsampled_iraqi), nrow(downsampled_pima))
+
+# Perform downsampling on the datasets
+stan_std_downsampled <- stan_std[sample(nrow(stan_std), min_samples), ]
+downsampled_iraqi_downsampled <- downsampled_iraqi[sample(nrow(downsampled_iraqi), min_samples), ]
+downsampled_pima_downsampled <- downsampled_pima[sample(nrow(downsampled_pima), min_samples), ]
+
+# Create the merged_data dataframe
+merged_data <- data.frame(
+  age = c(stan_std_downsampled$age, downsampled_iraqi_downsampled$age, downsampled_pima_downsampled$age),
+  bmi = c(stan_std_downsampled$bmi, downsampled_iraqi_downsampled$bmi, downsampled_pima_downsampled$bmi),
+  dataset = rep(c("stan_std", "downsampled_iraqi", "downsampled_pima"), each = min_samples),
+   Class = c(rep(NA, min_samples), downsampled_iraqi_downsampled$Class, rep(NA, min_samples)),
+  diabetes = c(rep(NA, min_samples), rep(NA, min_samples), downsampled_pima_downsampled$diabetes)
+)
+
+
+# Create the "class" column based on the "Class" and "diabetes" columns
+merged_data$class <- ifelse(merged_data$dataset == "stan_std" |
+                               (merged_data$dataset == "downsampled_pima" & merged_data$diabetes == 1) |
+                               (merged_data$dataset == "downsampled_iraqi" & merged_data$Class == "Y"),
+                             1, 0)
+
+#Remove the unnecessary columns
+merged_data <- merged_data[, !(names(merged_data) %in% c("Class", "diabetes"))]
+
+```
+
+## Clustering and Contingency table 
+```{r}
+set.seed(314)  # Set seed for reproducibility
+
+# Perform clustering on bmi and age with k = 3
+clusters <- kmeans(merged_data[, c("bmi", "age")], centers = 3)
+merged_data$Cluster <- clusters$cluster
+
+# Create the count table
+count_table <- table(merged_data$Cluster, merged_data$dataset)
+
+# Add a column for the positive count (number of points with "class" == 1 for each cluster)
+positive_count <- sapply(1:3, function(i) sum(merged_data$class[merged_data$Cluster == i] == 1))
+count_table <- cbind(count_table, Positive = positive_count)
+
+# Add row and column names for better interpretation
+rownames(count_table) <- paste("Cluster", rownames(count_table))
+colnames(count_table) <- c("Iraqi", "Pima", "Stan","P")
+
+count_table
+```
+
+## Observation 
+The cluster membership do not correlate that much with the presence of diabetes.
+As all Stanford patients have diabetes. The clusters reflect different characteristics of the samples. These can derive from different sampling designs and even from differences between different ethnic groups, as the datasets were collected in different parts of the world.
+
+Moreover, we have observed that in the Iraqi dataset, the clustering approaches tend to group patients labeled as "P" and "N," indicating the need for a more precise characterization of the "P" category. It might be beneficial to reconsider the criteria for assigning the "P" label, possibly favoring equally spaced ordinal categories. By doing so, we would have better justification for the proportional odds assumption discussed earlier.
+
+
+###  Blood pressure and glucose features
+Without any domain knowledge, we cannot claim that the blood pressure and glucose features of the Stanford and Pima datasets are directly comparable even after normalization. Since the purpose of this analysis is to conduct a data-driven study, we must caution against making simplistic and potentially incorrect assumptions, such as "comparing the mean blood pressure and its minimum value is valid due to standardization."
+This assumption may hold true if the two sets of related features, when viewed as random variables, belong to the same scale-position distribution family. However, it is important to note that while this assumption may be reasonable for the blood pressure features, it is certainly not valid for the glucose measurements.
+Therefore, we should be cautious in drawing conclusions without a proper understanding of the underlying factors and considerations related to the specific features being analyzed.
+
+
+
+
+
+## Feature selection - naive approach
+
+```{r}
+# Perform linear regression for each feature
+model <- lm(y ~ ., data = stan_std)
+p_values <- summary(model)$coefficients[, "Pr(>|t|)"]
+
+# Sort the p-values in ascending order
+sorted_p_values <- sort(p_values)
+
+# Select the features with the lowest p-values
+k <- 5  # Select the top 10 features
+selected_features <- names(sorted_p_values)[1:k]
+
+# Print the selected features
+print(selected_features)
+
+```
+## Removing and repeating
+We remove "age", "tc","ldl","tch","hdl" and "glu" and repeat the procedure
+
+```{r}
+# Remove the specified variables from the stan_std dataset
+stan_std_subset <- stan_std[, !(names(stan_std) %in% c("age","tc", "ldl", "tch", "hdl", "glu"))]
+
+# Convert "sex" to a factor variable
+#stan_std_subset$sex <- as.factor(stan_std_subset$sex)
+# Perform linear regression for each feature
+model <- lm(y ~ ., data = stan_std_subset)
+p_values <- summary(model)$coefficients[, "Pr(>|t|)"]
+
+# Sort the p-values in ascending order
+sorted_p_values <- sort(p_values)
+
+# Select the features with the lowest p-values
+k <- 5  # Select the top 5 features
+selected_features <- names(sorted_p_values)[1:k]
+
+# Print the selected features
+print(selected_features)
+summary(model)
+
+```
+
+
+## Using leaps and exhaustive search
+
+The dimensions are not too high, we can perform an exhaustive search.
+```{r}
+library(leaps)
+
+# Perform an exhaustive search with size up to 5
+regfit.full <- regsubsets(y ~ ., data = stan_std, nvmax = 8, method = "exhaustive")
+
+# Get the results
+summary(regfit.full)
+
+```
+## Observations
+-   The results are quite stable. Only "tc" is used in the 4 regressors model and then used again with 6 (and not 5) regressors.
+
+```{r}
+#print R^2
+summary(regfit.full)$rsq
+
+#do the plot with adjusted R^2
+plot(summary(regfit.full)$adjr2, xlab="Number of variables", ylab="Adjusted R squared", type="l")
+
+```
+
+:::footnote:::
+Gareth James, Daniela Witten, Trevor Hastie, Robert Tibshirani. "An Introduction to Statistical Learning: with Applications in R." Springer, 2017.
+:::::::
+
+## Observation
+Even two variables seem to be enough. We conclude that "ltg" is probably not a confounding factor. Let us visualise the best models according to bic and Mallow's Cp criteria.
+I use BIC or Cp as a form of regularization, to avoid overfitting by penalizing models with more predictors.
+
+```{r}
+# Plot with BIC scale
+plot(regfit.full, scale = "bic")
+
+# Plot with Cp scale
+plot(regfit.full, scale = "Cp")
+```
+
+I observe that in the task associated with regression of the disease progression variable, the "age" feature is not in the best models here visualized.
+For the sake of completeness, the BIC is based on the likelihood function, so it assumes that the underlying model is correct and that the errors are independently and identically distributed, here we cannot verify these assumption, so the results obtained have to be taken only as an indication.
+
+
+## Pima dataset
+We use the bestglm() function from the bestglm package to identify the top 10 models according to the AIC criterium.
+
+```{r}
+library(bestglm)
+
+# Perform exhaustive search and select top 7 models based on AIC
+bglm.AIC_downsampled_pima = bestglm(Xy = downsampled_pima, family = binomial, IC = "AIC", 
+    TopModels = 7)
+
+bglm.AIC_downsampled_pima$BestModels
+```
+:::footer
+https://garthtarr.github.io/avfs/lab02_soln.html
+:::
+
+
+## What if instead I do not use the downsampled version of the dataset?
+```{r}
+library(bestglm)
+
+# Perform exhaustive search and select top 7 models based on AIC
+bglm.AIC_pima = bestglm(Xy = pima_std, family = binomial, IC = "AIC", 
+    TopModels = 7)
+
+bglm.AIC_pima$BestModels
+```
+
+The AIC values obviously increases and the algorithm is more expensive but the best model remains the same.
+
+```{r}
+bglm.AIC_pima$BestModel
+```
+## The coefficients have decreased
+```{r}
+library(knitr)
+
+# Create the coefficient data
+downsampled_coef <- c(-0.2075, 0.4860, 0.6075, 1.1152)
+original_coef <- c(-0.8725, 0.3896, 0.5896, 1.0621)
+
+# Create the table
+coef_table <- data.frame(
+  Model = c("Downsampled", "Original"),
+  `Intercept` = c(downsampled_coef[1], original_coef[1]),
+  age = c(downsampled_coef[2], original_coef[2]),
+  bmi = c(downsampled_coef[3], original_coef[3]),
+  glu1 = c(downsampled_coef[4], original_coef[4])
+)
+
+# Print the table in Quarto format
+kable(coef_table, format = "pipe", align = "c", caption = "Coefficients") 
+
+```
+
+## Diabetes distribution
+
+The histogram reveals that the downsampled model bias reflects the distribution in the dataset. A good scenario for new patients classification may be the one where we have a good estimate for the proportion of diabetic people between upcoming patients.
+We may have this estimate from a pivot study or from past records.
+
+```{r}
+library(ggplot2)
+
+# Create a histogram of diabetes feature distribution
+ggplot(pima_std, aes(x = diabetes)) +
+  geom_bar(fill = "steelblue", color = "black") +
+  labs(x = "Diabetes", y = "Count") +
+  labs(title = "Distribution of Diabetes Feature in Pima Dataset") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Feature selection with iraqi dataset
+
+Motivated by the cluster analysis we assign to the new "class" column 1 if the value in the "CLASS" column is "Y" and 0 otherwise.
+
+```{r}
+iraqi_bin <- iraqi_std
+iraqi_bin$class <- as.factor(ifelse(iraqi_std$CLASS == "Y", 1, 0))
+iraqi_bin$sex <- as.factor(iraqi_bin$sex)
+
+# Remove the "CLASS" column
+iraqi_bin <- iraqi_bin[, -which(names(iraqi_bin) == "CLASS")]
+```
+
+## Feature selection again
+```{r}
+library(bestglm)
+
+# Perform exhaustive search and select top 5 models based on AIC
+bglm.AIC_iraqi = bestglm(Xy = iraqi_bin, family = binomial, IC = "AIC", 
+    TopModels = 5)
+
+bglm.AIC_iraqi$BestModels
+```
+
+## With BIC as criterium
+```{r}
+# Perform exhaustive search and select top 5 models based on cross-validation
+bglm.bic_iraqi = bestglm(Xy = iraqi_bin, family = binomial, IC = "BIC", 
+                  TopModels = 5)
+bglm.bic_iraqi$BestModel ## Same results as AIC
+```
+
+
+## Further steps
+
+Combining data from all the available source could really help to develop a data-based approach to diabetes diagnosis. An accurate predictive model could foster researches in this sector and the gathering of higher quality datasets. The datasets now available could then be used to 
+
+-  Fine tune the models upon various patients ethnicities
+
+-  Ponder the choice of the best response variable
+
+-  Choosing the best regressors for the related task
+
+## Open to collaboration
+
+This project has been developed by Daniele Lotito for the course SLLD (module 1 and 2) by Prof. Francesca Chiaromonte.
+With the help of someone with medical domain knowledge on the topic this project can be developed and presented in a scientific paper. Further steps in this direction could be considering also panel datasets and focus on a specific task (e.g. classification or disease progression) to assess the most relevant features for the chosen task.
+
+
+:::footer
+[Course github page](https://github.com/EMbeDS-education/StatsAndComputing20222023/wiki/SLLD-Slides,-code-and-other-material )
+:::
+
+## Conclusions
+In this report we have compared three diabetes-related datasets.  
+Up to our knowledge, these three dataset have never been compared.
+These are more different than expected, but nonetheless we have been able to highlight their differences to warn against their possible misuse.
+
+## References
+
+1. Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning: Data Mining, Inference, and Prediction*. Springer.
+
+2. James, G., Witten, D., Hastie, T., & Tibshirani, R. (2013). *An Introduction to Statistical Learning*. Springer.
+
+3. Kuhn, M., & Johnson, K. (2013). *Applied Predictive Modeling*. Springer.
+
+4. Prentice, R. L., & Pyke, R. (1979). Logistic Disease Incidence Models and Case–Control Studies. *Biometrika*, *66*(3).
+
+5. Rajput, M. R., & Khedgikar, S. S. (2022). Diabetes prediction and analysis using medical attributes: A Machine learning approach. *Journal of Xi'an University of Architecture & Technology*, *14*(1), 98-103.
+
+6. Rashid, A. (2020). Diabetes dataset. *Mendeley Data*.
+
+7. Wickham, H., & Grolemund, G. (2017). *R for Data Science*. O'Reilly Media.
+
+## Data used
+
+-  Stanford. Efron, B., Hastie, T., Johnstone, I., & Tibshirani, R. (2004). Least angle regression, [Dataset source on Stanford Edu](https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html)\
+-  Pima Indian. [Dataset source on Kaggle](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)\
+-  Iraqi society. [Dataset source on Mendeley](https://data.mendeley.com/datasets/wj9rwkp9c2/1)
+
+
